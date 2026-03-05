@@ -185,7 +185,7 @@ const CryptoModal: React.FC<Props> = ({ open, onClose, mode }) => {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="glass-elevated border-border/30 max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0">
+      <DialogContent className="glass-elevated border-border/30 max-w-[92vw] sm:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col p-0">
         <DialogHeader className="px-6 pt-6 pb-0">
           <DialogTitle className="neon-text-gold text-xl tracking-wider font-black">
             💰 DEPOSIT
@@ -269,14 +269,6 @@ const CryptoModal: React.FC<Props> = ({ open, onClose, mode }) => {
                 </a>
               </div>
 
-              {/* Verification Section */}
-              <VerificationInput
-                txnId={txnId}
-                setTxnId={setTxnId}
-                verifyStatus={verifyStatus}
-                onSubmit={handleVerifySubmit}
-                placeholder="Enter FaucetPay Transaction ID"
-              />
             </div>
           )}
 
