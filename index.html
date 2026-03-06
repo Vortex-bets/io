@@ -211,14 +211,23 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .h-balance:hover{border-color:var(--gb2);}
 .currency-badge{background:var(--neon);color:#04060f;font-size:0.58rem;font-weight:800;padding:1px 5px;border-radius:4px;letter-spacing:0.05em;}
 .h-btn{
-  background:linear-gradient(135deg,var(--neon) 0%,var(--purple) 100%);
-  color:#04060f;border:none;cursor:pointer;
+  background:linear-gradient(135deg,#ff2dce 0%,#a020f0 45%,#00d4ff 100%);
+  color:#fff;border:none;cursor:pointer;
   padding:7px 16px;border-radius:var(--r3);
   font-family:var(--font-d);font-size:0.72rem;font-weight:700;
   letter-spacing:0.04em;text-transform:uppercase;
-  box-shadow:0 0 20px rgba(0,212,255,0.2);transition:all .2s;white-space:nowrap;
+  box-shadow:0 0 18px rgba(255,45,206,0.5),0 0 36px rgba(160,32,240,0.25);
+  transition:all .2s;white-space:nowrap;position:relative;overflow:hidden;
 }
-.h-btn:hover{box-shadow:0 0 30px rgba(0,212,255,0.4);transform:translateY(-1px);}
+.h-btn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  pointer-events:none;
+}
+.h-btn:hover{
+  box-shadow:0 0 28px rgba(255,45,206,0.7),0 0 56px rgba(160,32,240,0.4),0 0 80px rgba(0,212,255,0.2);
+  transform:translateY(-1px) scale(1.02);
+}
 .h-icon-btn{
   width:36px;height:36px;border-radius:50%;
   background:rgba(0,212,255,0.06);border:1px solid var(--gb);
@@ -313,7 +322,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 }
 
 /* ─── LAYOUT ─── */
-.app-layout{display:flex;padding-top:var(--header);min-height:100vh;}
+.app-layout{display:flex;padding-top:calc(var(--header) + 28px);min-height:100vh;}
+.app-layout.no-fomo{padding-top:var(--header);}
 .main-area{flex:1;min-width:0;padding-bottom:calc(var(--nav-h) + 8px);}
 @media(min-width:768px){.main-area{margin-left:var(--sidebar);padding-bottom:24px;}}
 .page{display:none;padding:14px;max-width:1200px;margin:0 auto;}
@@ -904,6 +914,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .text-gold{color:var(--gold);}
 .text-purple{color:var(--purple);}
 .text-muted{color:var(--text3);}
+
+/* ─── SMOOTH CURRENCY FADE-IN ─── */
+@keyframes cur-fade-in{
+  0%{opacity:0;transform:translateY(-4px);}
+  100%{opacity:1;transform:translateY(0);}
+}
+.cur-val.cur-anim,
+#hBalDisp.cur-anim,
+#walletBalDisp.cur-anim {
+  animation: cur-fade-in 0.35s ease both;
+}
 .font-mono{font-family:var(--font-m);}
 .font-display{font-family:var(--font-d);}
 .fw-700{font-weight:700;}
@@ -1092,6 +1113,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   border-radius:var(--r);overflow:hidden;
   border:1px solid rgba(0,212,255,.07);
 }
+@media(max-width:600px){
+  .pro-chart-wrap{
+    border-radius:0 !important;
+    margin-left:calc(-1 * var(--pad, 14px)) !important;
+    margin-right:calc(-1 * var(--pad, 14px)) !important;
+    width:calc(100% + 2 * var(--pad, 14px)) !important;
+    border-left:none !important;border-right:none !important;
+  }
+}
 #proTradeCanvas{display:block;width:100%;cursor:crosshair;}
 /* Crosshair tooltip */
 .chart-tooltip{
@@ -1217,6 +1247,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 </style>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -1326,12 +1357,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <span class="h-logo-text">VORTEX.IO</span>
   </div>
   <div class="h-spacer"></div>
-  <div class="h-balance" onclick="goPage('wallet')">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2" style="filter:drop-shadow(0 0 4px #ffd700);flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 6v2M12 16v2M8.5 8.5l1.5 1.5M14 14l1.5 1.5M8.5 15.5l1.5-1.5M14 10l1.5-1.5"/><circle cx="12" cy="12" r="3" fill="rgba(255,215,0,.2)"/></svg>
+  <div class="h-balance" id="hBalanceArea" onclick="toggleCryptoBalancePanel()" style="cursor:pointer;gap:6px;">
+    <span id="hCoinIcon" style="font-size:1rem;line-height:1;flex-shrink:0;">💵</span>
     <span id="hBalDisp">5,000.00</span>
+    <span id="hCoinTicker" style="font-size:.6rem;color:rgba(0,212,255,0.55);font-family:var(--font-m);">USDT</span>
     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="opacity:.4"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
-  <button class="h-btn" onclick="showDepositModal()">+ Deposit</button>
+  <!-- Crypto balance switcher panel -->
+  <div id="cryptoBalPanel" style="display:none;position:fixed;top:58px;right:80px;z-index:500;background:linear-gradient(135deg,#0a0614,#040810);border:1px solid rgba(255,45,206,0.3);border-radius:14px;min-width:220px;box-shadow:0 8px 40px rgba(160,32,240,0.3),0 0 1px rgba(255,45,206,0.4);overflow:hidden;">
+    <div style="padding:10px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.05);font-size:.6rem;color:rgba(255,45,206,0.7);font-family:var(--font-m);letter-spacing:.1em;">SELECT DISPLAY CURRENCY</div>
+    <div id="cryptoBalList" style="max-height:320px;overflow-y:auto;"></div>
+  </div>
+  <button class="h-btn" onclick="showDepositModal()">💎 Deposit</button>
+  <div class="h-icon-btn" id="voiceToggleBtn" onclick="toggleVoice()" title="Voice Coach" style="font-size:1rem;">🔊</div>
   <div class="h-icon-btn" onclick="toggleChat()" title="Chat">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     <div class="notif-dot" id="chatNotif" style="display:none"></div>
@@ -1358,6 +1396,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   <div class="pd-item" onclick="goPage('mailbox');closeDD()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/></svg>Mailbox</div>
   <div class="pd-item danger" onclick="signOut()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</div>
 </div>
+
+<!-- ══════════════ FOMO LIVE WIN TICKER ══════════════ -->
+<div id="fomoTickerBar" style="display:none;position:fixed;top:var(--header);left:0;right:0;z-index:195;height:28px;background:rgba(0,20,10,0.97);border-bottom:1px solid rgba(0,255,136,0.15);overflow:hidden;">
+  <div id="fomoTickerInner" style="display:flex;align-items:center;height:100%;white-space:nowrap;animation:fomo-scroll 38s linear infinite;will-change:transform;"></div>
+</div>
+<style>
+@keyframes fomo-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.fomo-item {
+  display:inline-flex;align-items:center;
+  padding:0 22px;font-family:'JetBrains Mono',monospace;
+  font-size:.62rem;color:rgba(0,255,136,0.85);white-space:nowrap;
+  border-right:1px solid rgba(0,255,136,0.1);
+}
+.fomo-item::before {
+  content:'●';margin-right:6px;font-size:.45rem;
+  color:#00ff88;animation:fomo-dot 1.2s ease-in-out infinite;
+}
+@keyframes fomo-dot{0%,100%{opacity:1;}50%{opacity:0.3;}}
+</style>
 
 <!-- ══════════════ SIDEBAR BACKDROP ══════════════ -->
 <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
@@ -1412,6 +1472,155 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         </div>
         <div class="hero-actions"><button class="btn btn-primary btn-lg" onclick="goPage('games')">Play Now</button><button class="btn btn-outline btn-lg" onclick="goPage('leaderboard')">Leaderboard</button></div>
       </div>
+
+      <!-- ══ FEATURED GAMES SLIDER ══ -->
+      <div class="mb-20">
+        <div class="sh mb-14"><div class="sh-title" style="background:linear-gradient(135deg,#ff2dce,#a020f0,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Featured Games</div></div>
+        <div id="featuredSlider" style="display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none;-webkit-overflow-scrolling:touch;" class="hscroll">
+          <!-- Vortex Mines -->
+          <div onclick="goPage('mines')" class="feat-card" style="--fc:#00ff88;">
+            <div class="feat-icon">
+              <svg viewBox="0 0 80 80" width="70" height="70">
+                <defs>
+                  <radialGradient id="mg1" cx="50%" cy="35%" r="60%"><stop offset="0%" stop-color="#00ff88" stop-opacity=".9"/><stop offset="100%" stop-color="#003322" stop-opacity="0"/></radialGradient>
+                  <filter id="mf1"><feGaussianBlur stdDeviation="2.5" result="blur"/><feComposite in="SourceGraphic" in2="blur" operator="over"/></filter>
+                </defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(0,255,136,0.06)" stroke="rgba(0,255,136,0.3)" stroke-width="1"/>
+                <!-- Grid of gems -->
+                <g filter="url(#mf1)">
+                  <polygon points="40,14 46,22 40,30 34,22" fill="#00ff88" opacity=".95" style="filter:drop-shadow(0 0 6px #00ff88)"/>
+                  <polygon points="22,32 28,40 22,48 16,40" fill="#00cc66" opacity=".8"/>
+                  <polygon points="40,34 46,42 40,50 34,42" fill="#00ffaa" opacity=".9" style="filter:drop-shadow(0 0 8px #00ff88)"/>
+                  <polygon points="58,32 64,40 58,48 52,40" fill="#00cc66" opacity=".8"/>
+                  <polygon points="28,54 34,62 28,70 22,62" fill="#00ff88" opacity=".6"/>
+                  <polygon points="52,54 58,62 52,70 46,62" fill="#00ff88" opacity=".6"/>
+                  <!-- Mine explosive -->
+                  <circle cx="40" cy="58" r="7" fill="rgba(255,51,102,0.15)" stroke="#ff3366" stroke-width="1.5"/>
+                  <line x1="40" y1="51" x2="40" y2="49" stroke="#ff3366" stroke-width="1.5"/>
+                  <line x1="47" y1="55" x2="49" y2="53" stroke="#ff3366" stroke-width="1.5"/>
+                  <line x1="47" y1="61" x2="49" y2="63" stroke="#ff3366" stroke-width="1.5"/>
+                  <circle cx="40" cy="58" r="3" fill="#ff3366"/>
+                </g>
+                <circle cx="40" cy="40" r="38" fill="url(#mg1)" opacity=".4"/>
+              </svg>
+            </div>
+            <div class="feat-name">Vortex Mines</div>
+            <div class="feat-sub">Up to 1000×</div>
+          </div>
+          <!-- VTX Trading -->
+          <div onclick="goPage('trade')" class="feat-card" style="--fc:#00d4ff;">
+            <div class="feat-icon">
+              <svg viewBox="0 0 80 80" width="70" height="70">
+                <defs><radialGradient id="tg1" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#00d4ff" stop-opacity=".7"/><stop offset="100%" stop-color="#001a33" stop-opacity="0"/></radialGradient></defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(0,212,255,0.06)" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+                <!-- Candlestick chart -->
+                <g style="filter:drop-shadow(0 0 4px #00d4ff)">
+                  <line x1="18" y1="55" x2="18" y2="35" stroke="#ff3366" stroke-width="1"/>
+                  <rect x="14" y="43" width="8" height="8" fill="#ff3366" rx="1"/>
+                  <line x1="30" y1="50" x2="30" y2="28" stroke="#00ff88" stroke-width="1"/>
+                  <rect x="26" y="33" width="8" height="12" fill="#00ff88" rx="1"/>
+                  <line x1="42" y1="48" x2="42" y2="20" stroke="#ff3366" stroke-width="1"/>
+                  <rect x="38" y="35" width="8" height="10" fill="#ff3366" rx="1"/>
+                  <line x1="54" y1="38" x2="54" y2="15" stroke="#00ff88" stroke-width="1"/>
+                  <rect x="50" y="20" width="8" height="14" fill="#00ff88" rx="1"/>
+                </g>
+                <!-- VTX label -->
+                <text x="40" y="70" text-anchor="middle" font-family="Orbitron" font-size="9" font-weight="700" fill="#00d4ff" opacity=".9">VTX/USDT</text>
+                <!-- Up arrow overlay -->
+                <polyline points="20,58 32,46 44,52 62,30" fill="none" stroke="#00d4ff" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 5px #00d4ff)" opacity=".6"/>
+                <circle cx="40" cy="40" r="38" fill="url(#tg1)" opacity=".25"/>
+              </svg>
+            </div>
+            <div class="feat-name">VTX Trading</div>
+            <div class="feat-sub">Live Market</div>
+          </div>
+          <!-- Neon Crash -->
+          <div onclick="goPage('crash')" class="feat-card" style="--fc:#ff4d6a;">
+            <div class="feat-icon">
+              <svg viewBox="0 0 80 80" width="70" height="70">
+                <defs>
+                  <linearGradient id="cg1" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ff3366"/><stop offset="100%" stop-color="#ff9900"/></linearGradient>
+                  <radialGradient id="cg2" cx="50%" cy="80%" r="60%"><stop offset="0%" stop-color="#ff3366" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+                </defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(255,51,102,0.06)" stroke="rgba(255,51,102,0.3)" stroke-width="1"/>
+                <!-- Rocket -->
+                <g transform="translate(40,42) rotate(-40) translate(-12,-24)" style="filter:drop-shadow(0 0 6px #ff4d6a)">
+                  <path d="M12 0 Q18 8 18 20 L12 28 L6 20 Q6 8 12 0Z" fill="url(#cg1)"/>
+                  <circle cx="12" cy="14" r="3" fill="rgba(255,255,255,0.4)"/>
+                  <path d="M6 20 L2 26 L8 24Z" fill="#ff9900" opacity=".8"/>
+                  <path d="M18 20 L22 26 L16 24Z" fill="#ff9900" opacity=".8"/>
+                  <path d="M9 28 Q12 34 15 28" fill="#ff5500" opacity=".9" style="filter:drop-shadow(0 0 4px #ff5500)"/>
+                </g>
+                <!-- Chart line -->
+                <polyline points="10,65 20,55 32,50 45,38 62,18" fill="none" stroke="rgba(255,153,0,0.6)" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="40" cy="40" r="38" fill="url(#cg2)" opacity=".3"/>
+                <text x="40" y="74" text-anchor="middle" font-family="Orbitron" font-size="8" font-weight="700" fill="#ff4d6a" opacity=".9">NEON CRASH</text>
+              </svg>
+            </div>
+            <div class="feat-name">Neon Crash</div>
+            <div class="feat-sub">Infinite Multiplier</div>
+          </div>
+          <!-- Lightning Roulette -->
+          <div onclick="goPage('roulette')" class="feat-card" style="--fc:#ffd700;">
+            <div class="feat-icon">
+              <svg viewBox="0 0 80 80" width="70" height="70">
+                <defs><radialGradient id="rg1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ffd700" stop-opacity=".4"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(255,215,0,0.05)" stroke="rgba(255,215,0,0.25)" stroke-width="1"/>
+                <!-- Roulette wheel segments -->
+                <g style="filter:drop-shadow(0 0 3px #ffd700)">
+                  <path d="M40 40 L40 12 A28 28 0 0 1 64 54Z" fill="rgba(255,51,51,0.7)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
+                  <path d="M40 40 L64 54 A28 28 0 0 1 28 66Z" fill="rgba(20,20,20,0.8)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
+                  <path d="M40 40 L28 66 A28 28 0 0 1 12 30Z" fill="rgba(255,51,51,0.7)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
+                  <path d="M40 40 L12 30 A28 28 0 0 1 40 12Z" fill="rgba(20,20,20,0.8)" stroke="rgba(255,215,0,0.3)" stroke-width=".5"/>
+                </g>
+                <circle cx="40" cy="40" r="14" fill="rgba(10,8,20,0.95)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+                <!-- Lightning bolt -->
+                <polygon points="44,28 37,40 42,40 36,52 47,38 41,38" fill="#ffd700" style="filter:drop-shadow(0 0 6px #ffd700)"/>
+                <!-- Ball -->
+                <circle cx="56" cy="26" r="3.5" fill="white" style="filter:drop-shadow(0 0 4px white)"/>
+                <circle cx="40" cy="40" r="38" fill="url(#rg1)" opacity=".3"/>
+                <text x="40" y="74" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ffd700" opacity=".9">LIGHTNING</text>
+              </svg>
+            </div>
+            <div class="feat-name">Lightning Roulette</div>
+            <div class="feat-sub">500× Multiplier</div>
+          </div>
+          <!-- Spin Master -->
+          <div onclick="showDevPopup('Spin Master')" class="feat-card" style="--fc:#c084fc;">
+            <div class="feat-icon">
+              <svg viewBox="0 0 80 80" width="70" height="70">
+                <defs>
+                  <radialGradient id="sg1" cx="50%" cy="50%" r="55%"><stop offset="0%" stop-color="#c084fc" stop-opacity=".5"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+                  <linearGradient id="sg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient>
+                </defs>
+                <circle cx="40" cy="40" r="38" fill="rgba(192,132,252,0.05)" stroke="rgba(192,132,252,0.25)" stroke-width="1"/>
+                <!-- Spinning wheel arms -->
+                <g style="filter:drop-shadow(0 0 5px #c084fc)">
+                  <line x1="40" y1="40" x2="40" y2="14" stroke="url(#sg2)" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="40" cy="12" r="4" fill="#c084fc"/>
+                  <line x1="40" y1="40" x2="63" y2="53" stroke="url(#sg2)" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="65" cy="54" r="4" fill="#7b2fff"/>
+                  <line x1="40" y1="40" x2="17" y2="53" stroke="url(#sg2)" stroke-width="3" stroke-linecap="round"/>
+                  <circle cx="15" cy="54" r="4" fill="#c084fc"/>
+                  <!-- Inner rings -->
+                  <circle cx="40" cy="40" r="18" fill="none" stroke="rgba(192,132,252,0.3)" stroke-width="1" stroke-dasharray="4 3"/>
+                  <circle cx="40" cy="40" r="10" fill="rgba(123,47,255,0.3)" stroke="rgba(192,132,252,0.6)" stroke-width="1.5"/>
+                  <circle cx="40" cy="40" r="5" fill="url(#sg2)"/>
+                  <!-- Star sparks -->
+                  <circle cx="24" cy="22" r="2" fill="#c084fc" opacity=".7"/>
+                  <circle cx="56" cy="20" r="1.5" fill="#c084fc" opacity=".6"/>
+                  <circle cx="62" cy="38" r="2" fill="#7b2fff" opacity=".7"/>
+                </g>
+                <circle cx="40" cy="40" r="38" fill="url(#sg1)" opacity=".3"/>
+                <text x="40" y="74" text-anchor="middle" font-family="Orbitron" font-size="7.5" font-weight="700" fill="#c084fc" opacity=".9">SPIN MASTER</text>
+              </svg>
+            </div>
+            <div class="feat-name">Spin Master</div>
+            <div class="feat-sub">Coming Soon</div>
+          </div>
+        </div>
+      </div>
+      <!-- ══ END FEATURED GAMES SLIDER ══ -->
       <div class="sh mb-12"><div class="sh-title">Live Wins</div></div>
       <div class="live-ticker mb-20" id="liveTicker"></div>
       <div class="stats-bar mb-20">
@@ -1785,14 +1994,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
     <button class="btn-neon" style="width:auto;padding:12px 40px;" onclick="toast('Tower game in development — stay tuned!','gold',3000)">Notify Me</button>
   </div>
 </div>
-<div id="page-trade" class="page" style="display:none;">
-  <div class="page-header">
-    <div class="page-title">📈 Pro Trading</div>
-    <div class="page-sub">BTC/USDT · Live Market</div>
+<div id="page-trade" class="page" style="display:none;padding:0 !important;margin:0 !important;">
+  <div class="page-header" style="margin:0 8px;">
+    <div class="page-title">⚡ VTX Ecosystem</div>
+    <div class="page-sub">VTX/USDT · Vortex Token · Live Market</div>
   </div>
 
   <!-- Tab bar -->
-  <div class="trade-tabs">
+  <div class="trade-tabs" style="margin:0 8px 8px;">
     <div class="trade-tab active" id="tab-chart" onclick="switchTradeTab('chart')">Chart</div>
     <div class="trade-tab" id="tab-signals" onclick="switchTradeTab('signals')">🤖 VIP Signals</div>
     <div class="trade-tab" id="tab-history" onclick="switchTradeTab('history')">History</div>
@@ -1801,29 +2010,53 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
   <!-- ── CHART PANEL ── -->
   <div class="trade-panel active" id="panel-chart">
     <!-- Live price ticker bar -->
-    <div class="trade-ticker-bar">
-      <span class="ttb-pair">BTC/USDT</span>
-      <span class="ttb-price" id="ttbPrice">$43,250.00</span>
+    <div class="trade-ticker-bar" style="margin:0;">
+      <span class="ttb-pair" style="color:#ffd700;">VTX/USDT</span>
+      <span class="ttb-price" id="ttbPrice">$0.4325</span>
       <span class="ttb-change up" id="ttbChange">+0.00%</span>
       <span class="ttb-stat">H: <span id="ttbHigh">—</span></span>
       <span class="ttb-stat">L: <span id="ttbLow">—</span></span>
       <span class="ttb-stat">Vol: <span id="ttbVol">1.2B</span></span>
     </div>
 
-    <!-- Pro candlestick chart -->
-    <div class="card mb-12">
-      <div class="pro-chart-wrap" style="height:280px;">
-        <canvas id="proTradeCanvas" style="height:280px;"></canvas>
+    <!-- Pro candlestick chart — FULL SCREEN edge-to-edge -->
+    <div style="width:100%;margin:0;padding:0;position:relative;background:#020408;overflow:hidden;">
+      <div id="vtxBetSummaryBar" style="position:absolute;top:0;left:0;right:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:4px 12px;background:rgba(2,4,8,0.85);border-bottom:1px solid rgba(0,212,255,0.12);font-family:'JetBrains Mono',monospace;font-size:.68rem;">
+        <span style="color:var(--green);">▲ UP: <span id="vtxUpPool">$0</span></span>
+        <span style="color:rgba(0,212,255,.5);font-size:.6rem;">HOUSE EDGE ACTIVE</span>
+        <span style="color:var(--red);">▼ DOWN: <span id="vtxDownPool">$0</span></span>
+      </div>
+      <!-- Drawing Toolbar -->
+      <div id="chartToolbar" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(2,4,12,0.95);border:1px solid rgba(0,212,255,0.1);border-radius:10px 10px 0 0;margin-top:28px;flex-wrap:wrap;">
+        <span style="font-size:.58rem;color:rgba(0,212,255,0.4);font-family:var(--font-m);letter-spacing:.06em;margin-right:4px;">TOOLS</span>
+        <button id="tool-cursor"  onclick="setChartTool('cursor')"  class="chart-tool-btn active" title="Crosshair">⊕</button>
+        <button id="tool-trend"   onclick="setChartTool('trend')"   class="chart-tool-btn" title="Trendline">╱</button>
+        <button id="tool-rect"    onclick="setChartTool('rect')"    class="chart-tool-btn" title="Rectangle">▭</button>
+        <button id="tool-hline"   onclick="setChartTool('hline')"   class="chart-tool-btn" title="Horizontal Line">—</button>
+        <div style="width:1px;height:18px;background:rgba(255,255,255,0.08);margin:0 4px;"></div>
+        <button onclick="clearChartDrawings()" class="chart-tool-btn" title="Clear drawings" style="color:rgba(255,80,80,0.7);">✕</button>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+          <button onclick="chartZoomIn()"  class="chart-tool-btn" title="Zoom In">+</button>
+          <button onclick="chartZoomOut()" class="chart-tool-btn" title="Zoom Out">−</button>
+          <button onclick="chartResetView()" class="chart-tool-btn" style="font-size:.55rem;padding:3px 6px;" title="Reset">FIT</button>
+        </div>
+      </div>
+      <div class="pro-chart-wrap" style="height:clamp(240px,55vw,380px);margin-top:0;border-radius:0 0 var(--r) var(--r);">
+        <canvas id="proTradeCanvas" style="height:100%;width:100%;touch-action:none;"></canvas>
         <div class="chart-tooltip" id="chartTooltip"></div>
       </div>
-    </div>
+      <style>
+        .chart-tool-btn{background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.15);color:var(--text2);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:.75rem;font-family:var(--font-m);transition:all .15s;}
+        .chart-tool-btn:hover,.chart-tool-btn.active{background:rgba(0,212,255,0.18);border-color:rgba(0,212,255,0.5);color:var(--neon);}
+      </style>
+    </div><!-- /vtx chart wrapper -->
 
     <!-- Bet controls -->
     <div class="card card-p mb-12">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
         <div>
           <div style="font-size:.65rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;">Bet Amount (USDT)</div>
-          <input class="ctrl-input" id="tradeBetAmt" type="number" value="10" min="1" inputmode="decimal" style="width:140px;"/>
+          <input class="ctrl-input" id="tradeBetAmt" type="number" value="5" min="1" inputmode="decimal" style="width:140px;"/>
         </div>
         <div style="text-align:right;">
           <div class="trade-timer-badge" id="tradeTimerBadge">
@@ -1835,6 +2068,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
       </div>
       <!-- Quick amounts -->
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
+        <button onclick="document.getElementById('tradeBetAmt').value=1" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$1</button>
         <button onclick="document.getElementById('tradeBetAmt').value=5" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$5</button>
         <button onclick="document.getElementById('tradeBetAmt').value=10" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$10</button>
         <button onclick="document.getElementById('tradeBetAmt').value=25" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">$25</button>
@@ -1843,14 +2077,36 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
         <button onclick="tradeBetHalf()" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">½</button>
         <button onclick="tradeBetDouble()" style="padding:4px 10px;background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.15);border-radius:var(--r3);color:var(--text2);font-size:.68rem;cursor:pointer;">2×</button>
       </div>
-      <!-- Direction buttons -->
-      <div class="trade-dir-btns">
-        <button class="trade-up-btn" id="tradeUpBtn" onclick="placeTradeBet('up')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
+      <!-- Direction buttons — Premium Glass-morphism side-by-side -->
+      <div class="trade-dir-btns" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px;">
+        <button class="trade-up-btn" id="tradeUpBtn" onclick="placeTradeBet('up')" style="
+          background:linear-gradient(135deg,rgba(0,255,136,0.18),rgba(0,255,136,0.06));
+          border:1.5px solid rgba(0,255,136,0.4);
+          border-radius:16px;
+          backdrop-filter:blur(12px) saturate(180%);
+          -webkit-backdrop-filter:blur(12px) saturate(180%);
+          box-shadow:0 0 20px rgba(0,255,136,0.15),inset 0 1px 0 rgba(255,255,255,0.1);
+          color:#00ff88;padding:18px 10px;font-family:'Orbitron',sans-serif;
+          font-size:.9rem;font-weight:800;letter-spacing:.05em;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:all .2s;cursor:pointer;
+        ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
           UP &nbsp;+95%
         </button>
-        <button class="trade-dn-btn" id="tradeDownBtn" onclick="placeTradeBet('down')">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+        <button class="trade-dn-btn" id="tradeDownBtn" onclick="placeTradeBet('down')" style="
+          background:linear-gradient(135deg,rgba(255,51,102,0.18),rgba(255,51,102,0.06));
+          border:1.5px solid rgba(255,51,102,0.4);
+          border-radius:16px;
+          backdrop-filter:blur(12px) saturate(180%);
+          -webkit-backdrop-filter:blur(12px) saturate(180%);
+          box-shadow:0 0 20px rgba(255,51,102,0.15),inset 0 1px 0 rgba(255,255,255,0.1);
+          color:#ff3366;padding:18px 10px;font-family:'Orbitron',sans-serif;
+          font-size:.9rem;font-weight:800;letter-spacing:.05em;
+          display:flex;align-items:center;justify-content:center;gap:8px;
+          transition:all .2s;cursor:pointer;
+        ">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
           DOWN &nbsp;+95%
         </button>
       </div>
@@ -2054,26 +2310,61 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 
 <!-- ══════════════ DEPOSIT MODAL ══════════════ -->
 <div class="overlay" id="depositModal">
-  <div class="modal">
-    <div class="modal-header"><div class="modal-title">💰 Deposit USDT</div><div class="modal-close" onclick="closeDepositModal()">✕</div></div>
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header"><div class="modal-title">💰 Deposit Crypto</div><div class="modal-close" onclick="closeDepositModal()">✕</div></div>
     <div class="modal-body">
-      <div class="crypto-list mb-12">
-        <div class="crypto-btn selected" onclick="selectCrypto('usdt_trc20',this)"><div class="crypto-icon">₮</div><div class="crypto-name" style="color:var(--green);">USDT TRC20</div></div>
-        <div class="crypto-btn" onclick="selectCrypto('usdt_erc20',this)"><div class="crypto-icon">Ξ</div><div class="crypto-name" style="color:var(--neon);">USDT ERC20</div></div>
-        <div class="crypto-btn" onclick="selectCrypto('btc',this)"><div class="crypto-icon">₿</div><div class="crypto-name" style="color:var(--gold);">Bitcoin</div></div>
-        <div class="crypto-btn" onclick="selectCrypto('sol',this)"><div class="crypto-icon">◎</div><div class="crypto-name" style="color:var(--purple);">Solana</div></div>
+      <!-- Coin selector — ERC20 removed -->
+      <div class="crypto-list mb-12" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+        <div class="crypto-btn selected" onclick="selectCrypto('usdt_trc20',this)" style="text-align:center;padding:10px 6px;">
+          <div class="crypto-icon">₮</div>
+          <div class="crypto-name" style="color:var(--green);">USDT</div>
+          <div style="font-size:.55rem;color:var(--text3);">TRC20</div>
+        </div>
+        <div class="crypto-btn" onclick="selectCrypto('btc',this)" style="text-align:center;padding:10px 6px;">
+          <div class="crypto-icon">₿</div>
+          <div class="crypto-name" style="color:var(--gold);">Bitcoin</div>
+          <div style="font-size:.55rem;color:var(--text3);">BTC</div>
+        </div>
+        <div class="crypto-btn" onclick="selectCrypto('sol',this)" style="text-align:center;padding:10px 6px;">
+          <div class="crypto-icon">◎</div>
+          <div class="crypto-name" style="color:var(--purple);">Solana</div>
+          <div style="font-size:.55rem;color:var(--text3);">SOL</div>
+        </div>
       </div>
-      <div id="cryptoDepositArea">
-        <div class="qr-placeholder" id="qrPlaceholder"><svg width="130" height="130" viewBox="0 0 130 130"><rect x="5" y="5" width="50" height="50" rx="3" fill="none" stroke="#00d4ff" stroke-width="3"/><rect x="15" y="15" width="30" height="30" rx="1" fill="#00d4ff" opacity="0.8"/><rect x="75" y="5" width="50" height="50" rx="3" fill="none" stroke="#00d4ff" stroke-width="3"/><rect x="85" y="15" width="30" height="30" rx="1" fill="#00d4ff" opacity="0.8"/><rect x="5" y="75" width="50" height="50" rx="3" fill="none" stroke="#00d4ff" stroke-width="3"/><rect x="15" y="85" width="30" height="30" rx="1" fill="#00d4ff" opacity="0.8"/><rect x="78" y="78" width="12" height="12" fill="#00d4ff"/><rect x="95" y="78" width="12" height="12" fill="#00d4ff"/><rect x="78" y="95" width="12" height="12" fill="#00d4ff"/><rect x="112" y="95" width="12" height="12" fill="#00d4ff"/><rect x="95" y="112" width="12" height="12" fill="#00d4ff"/><rect x="112" y="78" width="12" height="12" fill="#00d4ff"/><rect x="112" y="112" width="12" height="12" fill="#00d4ff"/></svg></div>
-        <div class="ctrl-label mb-4">Your Deposit Address</div>
-        <div class="deposit-addr" id="depositAddr">TXvortex7b2fSample1Address2Go3Here</div>
-        <button class="btn-neon" onclick="copyDepositAddr()">📋 Copy Address</button>
-        <div style="font-size:.7rem;color:var(--text3);text-align:center;margin-top:10px;line-height:1.7;">Send only the selected cryptocurrency to this address. Deposits are confirmed after network approval and credited within 1–30 minutes. Minimum deposit: $10.</div>
+
+      <!-- Real QR Code -->
+      <div id="qrRealBox" style="display:flex;flex-direction:column;align-items:center;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.15);border-radius:14px;padding:18px 14px;margin-bottom:12px;">
+        <div id="qrCodeCanvas" style="background:#fff;padding:10px;border-radius:10px;margin-bottom:12px;"></div>
+        <div class="ctrl-label mb-4" style="font-size:.68rem;">Scan to Pay Instantly</div>
+        <div class="deposit-addr" id="depositAddr" style="font-size:.65rem;word-break:break-all;cursor:pointer;" onclick="copyDepositAddr()">Loading…</div>
+        <button class="btn-neon" onclick="copyDepositAddr()" style="margin-top:10px;padding:8px 20px;font-size:.75rem;">📋 Copy Address</button>
       </div>
-      <div style="font-size:.7rem;color:rgba(0,212,255,.5);margin-top:14px;display:flex;align-items:center;gap:6px;justify-content:center;"><span style="width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;"></span>Pending approval by admin</div>
+
+      <!-- Payment Confirmed Animation (hidden by default) -->
+      <div id="payConfirmAnim" style="display:none;text-align:center;padding:16px 0;animation:pay-confirm 0.5s ease;">
+        <div style="font-size:2.5rem;margin-bottom:6px;">✅</div>
+        <div style="color:#00ff88;font-weight:700;font-size:.95rem;font-family:var(--font-d);">Payment Confirmed!</div>
+        <div style="color:var(--text3);font-size:.72rem;margin-top:4px;">Blockchain verified · Crediting now…</div>
+      </div>
+
+      <div style="font-size:.68rem;color:var(--text3);text-align:center;line-height:1.7;margin-bottom:14px;">
+        Deposits confirmed after network approval · Credited within 1–30 min · Min $10
+      </div>
+
+      <!-- Live Blockchain Feed -->
+      <div style="border-top:1px solid rgba(0,212,255,0.08);padding-top:12px;">
+        <div style="font-size:.6rem;color:rgba(0,212,255,0.5);font-family:var(--font-m);letter-spacing:.08em;margin-bottom:8px;">LIVE BLOCKCHAIN FEED</div>
+        <div id="liveBlockchainFeed" style="display:flex;flex-direction:column;gap:5px;max-height:110px;overflow:hidden;"></div>
+      </div>
     </div>
   </div>
 </div>
+<style>
+@keyframes pay-confirm{from{transform:scale(0.7);opacity:0;}to{transform:scale(1);opacity:1;}}
+@keyframes feed-in{from{transform:translateX(-10px);opacity:0;}to{transform:translateX(0);opacity:1;}}
+.feed-row{display:flex;align-items:center;gap:7px;font-size:.62rem;font-family:var(--font-m);color:var(--text2);animation:feed-in 0.4s ease;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.feed-dot{width:6px;height:6px;border-radius:50%;background:#00ff88;box-shadow:0 0 6px #00ff88;flex-shrink:0;}
+</style>
 
 <!-- ══════════════ WITHDRAW MODAL ══════════════ -->
 <div class="overlay" id="withdrawModal">
@@ -2249,7 +2540,181 @@ function winFlashFX() {
 const fmt = n => isNaN(n) ? '0' : Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const rnd = (a, b) => Math.random() * (b - a) + a;
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-const names = ['CryptoKing', 'LuckyDev', 'VortexPro', 'ShadowBet', 'NightOwl', 'DigitalAce', 'Maverick7', 'StarPlayer', 'BigWinner', 'ProGambler', 'NeonRider', 'QuantumBet', 'ZeroGrav', 'Supra99', 'BlazeX'];
+
+/* ══════════════════════════════════════════════════
+   VOICE OF SUCCESS ENGINE  —  Web Speech API
+   20+ phrases, English/Hindi mix, win + loss modes
+   ══════════════════════════════════════════════════ */
+const VOICE_WIN_PHRASES = [
+  "You are the best! Absolutely the best!",
+  "You are the best! Nobody plays like you!",
+  "You are great! So much talent!",
+  "Legendary move! Keep going champion!",
+  "You are the best trader on Vortex today!",
+  "Incredible! You read the market perfectly!",
+  "Champion! That was a pro play!",
+  "Unstoppable! You are on fire today!",
+  "Masterclass! Your timing is insane!",
+  "You are built different! Absolute genius!",
+  "Wah wah! Ekdum mast! You are a king!",
+  "Bahut badhiya! Aap toh pro hain!",
+  "Sher ka dil! Win after win after win!",
+  "Pure instinct! Nobody does it like you!",
+  "Golden touch! Everything you touch wins today!",
+  "That is the Vortex spirit! Keep crushing it!",
+  "You are the best! This is your moment!",
+  "What a move! You are simply the best!",
+  "Hat trick incoming! You are unstoppable!",
+  "Pure skill! You are the best on the platform!",
+];
+
+const VOICE_LOSS_PHRASES = [
+  "You are so close! Just zero point one away!",
+  "You were too fast for the market. Try again!",
+  "The candle literally turned in the last second! So unlucky!",
+  "That's not a loss, that's a warm-up. Next round is yours!",
+  "V-Bot says: reversal incoming. Perfect time to go again!",
+  "Almost! Your entry was flawless. The timing just needs a tiny tweak!",
+  "Arre yaar! Itna close tha! Ek aur try karo!",
+  "The market respects boldness. Come back stronger!",
+  "That was a statistical anomaly. The odds are now in your favour!",
+  "You have the right strategy. Just one more round!",
+  "So near, so very near! The win is right around the corner!",
+  "Don't stop now! Legends never quit after one round!",
+  "That's how trading works. One bad tick doesn't define you!",
+  "VTX recovery signal detected. This is your moment!",
+  "Bilkul sahi direction tha! Ek baar aur!",
+];
+
+let _voiceEnabled = true;
+let _lastVoiceTime = 0;
+const VOICE_COOLDOWN_MS = 3500;
+let _voiceSynth = window.speechSynthesis || null;
+let _preferredVoice = null;
+
+function initVoiceEngine() {
+  if (!_voiceSynth) return;
+  const loadVoices = () => {
+    const voices = _voiceSynth.getVoices();
+    // Prefer a natural female English voice
+    _preferredVoice = voices.find(v => /female|zira|samantha|google uk english female/i.test(v.name))
+      || voices.find(v => /en[-_]IN|en[-_]US|en[-_]GB/i.test(v.lang) && !v.name.includes('Male'))
+      || voices.find(v => /en/i.test(v.lang))
+      || voices[0]
+      || null;
+  };
+  loadVoices();
+  if (_voiceSynth.onvoiceschanged !== undefined) _voiceSynth.onvoiceschanged = loadVoices;
+}
+
+function speakPhrase(text, rate=0.94, pitch=1.08) {
+  if (!_voiceEnabled || !_voiceSynth) return;
+  const now = Date.now();
+  if (now - _lastVoiceTime < VOICE_COOLDOWN_MS) return;
+  _lastVoiceTime = now;
+  try {
+    _voiceSynth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate  = rate + (Math.random() * 0.06 - 0.03);
+    u.pitch = pitch + (Math.random() * 0.12 - 0.06);
+    u.volume = 0.92;
+    if (_preferredVoice) u.voice = _preferredVoice;
+    _voiceSynth.speak(u);
+  } catch(e) {}
+}
+
+function voiceWin(profit)  { speakPhrase(pick(VOICE_WIN_PHRASES),  0.92, 1.12); }
+function voiceLoss(amount) { speakPhrase(pick(VOICE_LOSS_PHRASES), 0.96, 1.04); }
+
+function toggleVoice() {
+  _voiceEnabled = !_voiceEnabled;
+  const btn = document.getElementById('voiceToggleBtn');
+  if (btn) btn.innerHTML = _voiceEnabled ? '🔊' : '🔇';
+  toast(_voiceEnabled ? '🔊 Voice Coach ON' : '🔇 Voice Coach OFF', 'info', 1800);
+}
+
+// Auto-init when browser is ready
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initVoiceEngine);
+else initVoiceEngine();
+
+/* ══════════════════════════════════════════════════
+   CRYPTO BALANCE SELECTOR
+   15 coins — live simulated rates — balance conversion
+   ══════════════════════════════════════════════════ */
+const CRYPTO_COINS = [
+  { id:'usdt',  sym:'USDT',  name:'Tether',         icon:'₮',  color:'#26a17b', rate:1,          dec:2 },
+  { id:'vtx',   sym:'VTX',   name:'Vortex Token',   icon:'⚡', color:'#00d4ff', rate:0.4325,     dec:4 },
+  { id:'btc',   sym:'BTC',   name:'Bitcoin',        icon:'₿',  color:'#f7931a', rate:67420,       dec:8 },
+  { id:'eth',   sym:'ETH',   name:'Ethereum',       icon:'Ξ',  color:'#627eea', rate:3540,        dec:6 },
+  { id:'sol',   sym:'SOL',   name:'Solana',         icon:'◎',  color:'#9945ff', rate:178.5,       dec:4 },
+  { id:'xrp',   sym:'XRP',   name:'Ripple',         icon:'✕',  color:'#00aae4', rate:0.635,       dec:2 },
+  { id:'bnb',   sym:'BNB',   name:'BNB',            icon:'⬡',  color:'#f3ba2f', rate:580,         dec:4 },
+  { id:'ada',   sym:'ADA',   name:'Cardano',        icon:'₳',  color:'#0d1e7e', rate:0.485,       dec:2 },
+  { id:'doge',  sym:'DOGE',  name:'Dogecoin',       icon:'Ð',  color:'#c2a633', rate:0.168,       dec:2 },
+  { id:'matic', sym:'MATIC', name:'Polygon',        icon:'◈',  color:'#8247e5', rate:0.92,        dec:2 },
+  { id:'avax',  sym:'AVAX',  name:'Avalanche',      icon:'🔺', color:'#e84142', rate:38.5,        dec:4 },
+  { id:'dot',   sym:'DOT',   name:'Polkadot',       icon:'●',  color:'#e6007a', rate:7.85,        dec:4 },
+  { id:'link',  sym:'LINK',  name:'Chainlink',      icon:'⬡',  color:'#375bd2', rate:14.2,        dec:4 },
+  { id:'ltc',   sym:'LTC',   name:'Litecoin',       icon:'Ł',  color:'#bfbbbb', rate:85.4,        dec:6 },
+  { id:'inr',   sym:'INR',   name:'Indian Rupee',   icon:'₹',  color:'#ff9900', rate:0.012,       dec:0 },
+];
+
+let activeCoinId = 'usdt';
+
+function buildCryptoBalPanel() {
+  const list = document.getElementById('cryptoBalList');
+  if (!list) return;
+  list.innerHTML = CRYPTO_COINS.map(c => {
+    const bal = balance / c.rate;
+    const balFmt = bal.toFixed(c.dec);
+    return `<div class="cbal-item${c.id===activeCoinId?' active':''}" onclick="selectBalCoin('${c.id}')">
+      <div class="cbal-coin" style="background:${c.color}22;border:1px solid ${c.color}44;color:${c.color};">${c.icon}</div>
+      <div class="cbal-info">
+        <div class="cbal-name" style="color:${c.color};">${c.sym}</div>
+        <div class="cbal-rate">${c.name}</div>
+      </div>
+      <div class="cbal-val">${c.id==='inr'?'₹':c.sym==='USDT'?'$':''}${balFmt}</div>
+    </div>`;
+  }).join('');
+}
+
+let _cbPanelOpen = false;
+function toggleCryptoBalancePanel() {
+  const panel = document.getElementById('cryptoBalPanel');
+  if (!panel) return;
+  _cbPanelOpen = !_cbPanelOpen;
+  if (_cbPanelOpen) { buildCryptoBalPanel(); panel.style.display='block'; }
+  else panel.style.display = 'none';
+}
+
+function selectBalCoin(id) {
+  activeCoinId = id;
+  updateHeaderBalDisplay();
+  const panel = document.getElementById('cryptoBalPanel');
+  if (panel) panel.style.display = 'none';
+  _cbPanelOpen = false;
+}
+
+function updateHeaderBalDisplay() {
+  const coin = CRYPTO_COINS.find(c => c.id === activeCoinId) || CRYPTO_COINS[0];
+  const bal  = balance / coin.rate;
+  const icon = document.getElementById('hCoinIcon');
+  const disp = document.getElementById('hBalDisp');
+  const tick = document.getElementById('hCoinTicker');
+  if (icon) { icon.textContent = coin.icon; icon.style.color = coin.color; }
+  if (disp) { disp.textContent = bal.toFixed(Math.min(coin.dec, 4)); }
+  if (tick) { tick.textContent = coin.sym; tick.style.color = coin.color + 'aa'; }
+}
+
+// Close panel on outside click
+document.addEventListener('click', e => {
+  if (_cbPanelOpen && !e.target.closest('#hBalanceArea') && !e.target.closest('#cryptoBalPanel')) {
+    const panel = document.getElementById('cryptoBalPanel');
+    if (panel) panel.style.display='none';
+    _cbPanelOpen = false;
+  }
+});
+const names = ['Aryan_12','Priya.v','Rahul_K','Sameer99','Neha_07','Rohit.bet','Anjali_x','Vikram22','Sneha_R','Karan.io','Divya09','Amit_VTX','Pooja.w','Ravi_bet','Simran_3','Deepak11','Meera.v','Suresh_G','Kavya.x','Nikhil_8','Ritika07','Harsh_K','Priyanka.b','Yash_23','Sonal_9','Manish.r','Tanya_io','Akash_VX','Sakshi.4','Arjun_TX'];
 const hindiMessages = ["Bhai kismat chamak rahi hai!", "Ek aur round karunga!", "Yeh mine wala game mast hai!", "10x aa gaya kya bhai?", "Kal 50x pe cashout kiya tha!", "Vortex mein toh sab possible hai!"];
 
 let toastTimer;
@@ -2264,7 +2729,8 @@ function toast(msg, type = 'info', dur = 3000) {
 function updateBalance(delta) {
   balance += delta;
   if (balance < 0) balance = 0;
-  document.querySelectorAll('#hBalDisp, #walletBalDisp').forEach(el => { if (el) el.textContent = fmt(balance); });
+  updateHeaderBalDisplay();
+  document.querySelectorAll('#walletBalDisp').forEach(el => { if (el) el.textContent = fmt(balance); });
 }
 
 function recordBet(game, wager, mult, pnl) {
@@ -2435,7 +2901,13 @@ function completeLogin(user) {
   document.getElementById('mainApp').style.display = 'flex';
   document.getElementById('mainSidebar').style.display = 'flex';
   document.getElementById('mainNav').style.display = 'flex';
+  // ── Start FOMO live ticker ──
+  const fomoBar = document.getElementById('fomoTickerBar');
+  if (fomoBar) { fomoBar.style.display = 'block'; buildFomoTicker(); }
+  // Refresh ticker content every 25s with new names/amounts
+  setInterval(() => buildFomoTicker(), 25000);
   updateProfileUI();
+  setTimeout(updateHeaderBalDisplay, 100);
   if (authMode === 'signup' || !localStorage.getItem('vx_welcomed')) {
     freeSpins = 5;
     localStorage.setItem('vx_welcomed', '1');
@@ -2540,24 +3012,102 @@ const CAT_ICONS = [
 
 const GAMES_DATA = [
   { id: 'crash', name: 'Crash', players: 847, badge: 'hot', bgColor: '#0d0508' },
-  { id: 'mines', name: 'Mines', players: 632, badge: 'hot', bgColor: '#020d06' },
-  { id: 'tower', name: 'Tower', players: 412, badge: 'new', bgColor: '#08041a' },
-  { id: 'singularity', name: 'Singularity', players: 389, badge: 'new', bgColor: '#08041a' },
-  { id: 'rush', name: 'Vortex Rush', players: 298, badge: 'new', bgColor: '#020a0f' },
-  { id: 'roulette', name: 'Roulette', players: 521, badge: '', bgColor: '#0f0600' },
-  { id: 'dice', name: 'Dice', players: 389, badge: '', bgColor: '#07020f' },
-  { id: 'limbo', name: 'Limbo', players: 287, badge: '', bgColor: '#0f0c00' },
-  { id: 'wheel', name: 'Wheel', players: 245, badge: '', bgColor: '#020f06' },
-  { id: 'hilo', name: 'HiLo', players: 198, badge: '', bgColor: '#0f0208' },
-  { id: 'plinko', name: 'Plinko', players: 334, badge: '', bgColor: '#02080f' },
+  { id: 'mines', name: 'Mines', players: 732, badge: 'hot', bgColor: '#020d06' },
+  { id: 'tower', name: 'Tower', players: 512, badge: 'new', bgColor: '#08041a' },
+  { id: 'singularity', name: 'Singularity', players: 489, badge: 'new', bgColor: '#08041a' },
+  { id: 'rush', name: 'Vortex Rush', players: 598, badge: 'new', bgColor: '#020a0f' },
+  { id: 'roulette', name: 'Roulette', players: 621, badge: '', bgColor: '#0f0600' },
+  { id: 'dice', name: 'Dice', players: 489, badge: '', bgColor: '#07020f' },
+  { id: 'limbo', name: 'Limbo', players: 487, badge: '', bgColor: '#0f0c00' },
+  { id: 'wheel', name: 'Wheel', players: 445, badge: '', bgColor: '#020f06' },
+  { id: 'hilo', name: 'HiLo', players: 498, badge: '', bgColor: '#0f0208' },
+  { id: 'plinko', name: 'Plinko', players: 534, badge: '', bgColor: '#02080f' },
 ];
 const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice']);
 const ALL_100_GAMES = (function(){
   const extras = ['Blackjack','Baccarat','Keno','Slots Pro','Dragon Tiger','Andar Bahar','Teen Patti','3 Card Poker','Sic Bo','Pai Gow','Fast Keno','Lightning Dice','Super Sic Bo','Dragon Drop','Money Wheel','Golden Bat','Speed Baccarat','Quantum Roulette','Monopoly Live','Deal or No Deal','Football Studio','Gonzo Quest','Book of Dead','Starburst','Reactoonz','Gates of Olympus','Sweet Bonanza','Big Bass Bonanza','Money Train','Dead or Alive','Razor Shark','Wolf Gold','Rise of Merlin','Jammin Jars','Fruit Party','Invaders Moon','Release the Kraken','Buffalo King','Primate King','Wild West Gold','Piggy Riches','Reel King','Eye of Horus','Fishin Frenzy','Rainbow Riches','Mega Moolah','Divine Fortune','Hall of Gods','Age of Gods','Jackpot Giant','Gladiator','Lara Croft','Sherlock','Batman','Jurassic Park','Terminator','Iron Man','Thor','Hulk','Captain America','Spider Man','X Men','Fantastic Four','Blade','Daredevil','Punisher','Ghost Rider','Elektra','Wolverine','Cyclops','Storm','Jean Grey','Rogue','Gambit','Avalon','Thunderstruck','Immortal Romance','Hitman','Tomb Raider','Playboy','Lucky Leprechaun','Tiki Bounce','Amazon Wild','Snow Leopard','Dolphin Coast','Mega Gems','Diamond Empire','Royal Charm'];
   const base = [...GAMES_DATA];
-  extras.forEach((name, i) => base.push({ id: 'dev_' + i, name, players: Math.floor(50 + Math.random()*300), badge:'', bgColor:'#04060f', dev:true }));
+  extras.forEach((name, i) => base.push({ id: 'dev_' + i, name, players: 400 + Math.floor(Math.random()*500), badge:'', bgColor:'#04060f', dev:true }));
   return base.slice(0, 100);
 })();
+
+/* ─── SMART FOMO TICKER WITH COUNTRY CURRENCY ─── */
+const INDIAN_NAMES  = new Set(['Aryan_12','Priya.v','Rahul_K','Sameer99','Neha_07','Rohit.bet','Anjali_x','Vikram22','Sneha_R','Karan.io','Divya09','Amit_VTX','Pooja.w','Ravi_bet','Simran_3','Deepak11','Meera.v','Suresh_G','Kavya.x','Nikhil_8','Ritika07','Harsh_K','Priyanka.b','Yash_23','Sonal_9','Manish.r','Tanya_io','Akash_VX','Sakshi.4','Arjun_TX']);
+const WESTERN_NAMES = ['Alex.W','Sarah_K','Mike_T','Emma.J','Ryan_B','Lisa.M','Jake_R','Chloe_X','Noah_G','Olivia.B','Ethan_V','Ava_99','Liam.K','Zoe_Bet','Chris_T'];
+const WHALE_NAMES   = ['VTX_Whale','CryptoLord','SatoshiX','WhaleAlert','BlockMaster','CoinGod','DeFi_King','NFT_Boss','BitLegend','GweiMax'];
+
+function fomoFormatWin(name) {
+  const game = pick(['VTX','Mines','Crash','Dice','Roulette','Rush']);
+  if (INDIAN_NAMES.has(name)) {
+    const inr = (Math.random()*1200+200).toFixed(0);
+    return `${name} won ₹${inr} on ${game}`;
+  }
+  if (WESTERN_NAMES.includes(name)) {
+    const usd = (Math.random()*18+3).toFixed(2);
+    return `${name} won $${usd} on ${game}`;
+  }
+  // Whale — show in VTX or BTC
+  if (Math.random() > 0.5) {
+    const vtx = (Math.random()*80+20).toFixed(1);
+    return `${name} won ${vtx} VTX on ${game} ⚡`;
+  }
+  const btc = (Math.random()*0.0008+0.0001).toFixed(5);
+  return `${name} won ${btc} BTC on ${game} 🐳`;
+}
+
+const ALL_FOMO_NAMES = [...Array.from(INDIAN_NAMES), ...WESTERN_NAMES, ...WHALE_NAMES];
+
+function buildFomoTicker() {
+  const el = document.getElementById('fomoTickerInner');
+  if (!el) return;
+  const items = Array.from({length:20}, () => {
+    const name = pick(ALL_FOMO_NAMES);
+    return `<span class="fomo-item">${fomoFormatWin(name)}</span>`;
+  });
+  el.innerHTML = items.join('') + items.join('');
+}
+
+function renderHome() {
+  // Hot games horizontal scroll
+  const hot = document.getElementById('hotGamesRow');
+  if (hot && hot.innerHTML === '') {
+    hot.innerHTML = ALL_100_GAMES.slice(0, 8).map(g => {
+      const icon = NEON_ICONS[g.id] || CAT_ICONS[Math.abs((g.name.charCodeAt(0)||0) + (g.name.charCodeAt(1)||0)) % CAT_ICONS.length];
+      const active = ACTIVE_GAMES_SET.has(g.id);
+      const clickFn = active ? `goPage('${g.id}')` : `showDevPopup('${g.name}')`;
+      return `<div class="game-card" onclick="${clickFn}" style="min-width:130px;flex-shrink:0;">
+        <div class="gc-icon" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor||'#04060f'} 0%,#020408 70%);">${icon}</div>
+        <div class="gc-body"><div class="gc-name">${g.name}</div><div class="gc-players"><span class="gc-dot"></span>${(400+Math.floor(Math.random()*500)).toLocaleString()} online</div></div>
+      </div>`;
+    }).join('');
+  }
+  // Recent big wins table
+  const tbody = document.getElementById('recentWinsTbody');
+  if (tbody) {
+    const games = ['VTX Trade','Mines','Crash','Roulette','Dice','Rush'];
+    const mults = [1.95, 2.10, 1.85, 2.00, 3.40, 1.75, 2.50, 1.90];
+    tbody.innerHTML = Array.from({length:8}, () => {
+      const wager = (Math.random()*18+2).toFixed(2);
+      const mult = pick(mults);
+      const profit = (wager * mult - wager).toFixed(2);
+      return `<tr>
+        <td style="color:var(--text2)">${pick(names)}</td>
+        <td>${pick(games)}</td>
+        <td class="font-mono">$${wager}</td>
+        <td class="font-mono text-neon">${mult}×</td>
+        <td class="font-mono text-green">+$${profit}</td>
+      </tr>`;
+    }).join('');
+  }
+  // Live ticker
+  const ticker = document.getElementById('liveTicker');
+  if (ticker) {
+    ticker.innerHTML = Array.from({length:6}, () => {
+      const n = pick(ALL_FOMO_NAMES);
+      return `<div class="ticker-item">${fomoFormatWin(n)}</div>`;
+    }).join('');
+  }
+}
 
 function gameCard(g) {
   const active = ACTIVE_GAMES_SET.has(g.id);
@@ -2565,17 +3115,73 @@ function gameCard(g) {
   const clickFn = active ? `goPage('${g.id}')` : `showDevPopup('${g.name}')`;
   const soonBadge = g.dev ? `<span style="position:absolute;top:6px;right:6px;background:rgba(255,215,0,.12);color:var(--gold);font-size:.5rem;font-weight:700;padding:2px 5px;border-radius:8px;border:1px solid rgba(255,215,0,.2);z-index:2;">SOON</span>` : '';
   const mainBadge = g.badge ? `<span class="gc-badge ${g.badge}">${g.badge}</span>` : '';
+  const vbotSvg = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#00d4ff" stroke-width="2" style="filter:drop-shadow(0 0 5px #00d4ff);"><rect x="7" y="11" width="10" height="9" rx="2"/><path d="M12 11V8"/><circle cx="12" cy="6" r="2"/><circle cx="9.5" cy="14.5" r="1" fill="#00d4ff"/><circle cx="14.5" cy="14.5" r="1" fill="#00d4ff"/><path d="M9.5 18h5"/></svg>`;
+  // Live player count: base + jitter 400–900
+  const liveCount = (400 + Math.floor(Math.random() * 500)).toLocaleString();
   return `<div class="game-card" onclick="${clickFn}" style="${g.dev?'opacity:.75;':''}">
     ${mainBadge}${soonBadge}
     <div class="gc-play-overlay"><div class="gc-play-btn">${active?'Play Now':'Coming Soon'}</div></div>
     <div class="gc-icon" style="background:radial-gradient(ellipse at 40% 30%,${g.bgColor||'#04060f'} 0%,#020408 70%);">${icon}</div>
-    <div class="gc-body"><div class="gc-name">${g.name}</div><div class="gc-players"><span class="gc-dot"></span>${g.players.toLocaleString()} playing</div></div>
+    <div class="gc-body">
+      <div class="gc-name">${g.name}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
+        <div class="gc-players"><span class="gc-dot" style="animation:gc-blink 1.4s ease-in-out infinite;"></span>${liveCount} online</div>
+        <div onclick="event.stopPropagation();openVBot('${g.name.replace(/'/g,"\\'")}','${g.id}')" style="display:flex;align-items:center;gap:3px;cursor:pointer;padding:3px 6px;border-radius:8px;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.2);transition:all .15s;" title="AI V-Bot Strategy">
+          ${vbotSvg}
+          <span style="font-size:.55rem;color:var(--neon);font-weight:700;">V-BOT</span>
+        </div>
+      </div>
+    </div>
   </div>`;
 }
 
 function showDevPopup(name) {
   toast('🚧 ' + name + ': Development In Progress — Coming Soon!', 'gold', 3500);
 }
+
+/* ─── AI V-BOT MODAL ─── */
+const VBOT_DATA = {
+  crash: {
+    howto: 'Place a bet before the round starts. A rocket launches and a multiplier grows. Cash out BEFORE it crashes to multiply your bet. If you miss, you lose.',
+    strategy: '1. Use Auto Cash-out at 1.5×–2× for consistent wins.\n2. Never chase losses — stick to 2–5% of balance per bet.\n3. Use the Martingale limit: max 3 consecutive doubles.\n4. Watch the history — avoid rounds after 3+ consecutive low crashes.'
+  },
+  mines: {
+    howto: 'A 5×5 grid hides mines. Click tiles to reveal gems and grow your multiplier. Cash out anytime, but hitting a mine loses everything.',
+    strategy: '1. Start with 3 mines for balanced risk/reward.\n2. Reveal 3–4 gems then cash out — sweet spot multiplier.\n3. Never reveal more than 50% of tiles in one session.\n4. Increase mines count when balance is high for huge multipliers.'
+  },
+  roulette: {
+    howto: 'Pick a betting option (Red/Black, Even/Odd, Zero, or ranges). Spin the wheel and win if the ball lands on your chosen section.',
+    strategy: '1. Bet Red/Black for near 50% win rate (2× payout).\n2. D\'Alembert system: increase by 1 unit on loss, decrease by 1 on win.\n3. Never bet more than 10% of bankroll on Zero (36× but rare).\n4. Session limit: quit after 3× your starting stack.'
+  },
+  dice: {
+    howto: 'Set a target number and choose Roll Over or Roll Under. The dice rolls and you win if the result matches your prediction.',
+    strategy: '1. Set win chance to 49%–51% for near 2× return.\n2. Use small bets with high probability for consistent grinding.\n3. Avoid extremes (below 5% or above 95% chance).\n4. Flat bet system: never change bet size mid-session.'
+  },
+  singularity: {
+    howto: 'Spin a vortex. Your ship navigates around a black hole. The longer you survive, the higher your multiplier. Hit the hole and lose.',
+    strategy: '1. Use free spins for practice before wagering real funds.\n2. Low-bet strategy: 0.10 USDT to learn the pattern.\n3. Cash out at 3×–5× for optimal risk/reward ratio.\n4. Multiplier jumps are semi-random — don\'t read patterns.'
+  },
+  rush: {
+    howto: 'A rocket speeds through a tunnel. Place a bet and survive as long as possible while dodging obstacles. Your multiplier grows with time survived.',
+    strategy: '1. Cash out early at 2×–3× — obstacles increase in density.\n2. Practice runs first: learn obstacle timing patterns.\n3. Higher stakes = higher pressure. Start small.\n4. Never go all-in on Rush — variance is very high.'
+  },
+  default: {
+    howto: 'This is a skill-based betting game. Study the rules, start with small bets, and use the strategies below to maximize your edge.',
+    strategy: '1. Always set a session budget and stick to it.\n2. Start with minimum bets to understand the game flow.\n3. Use a 2% bankroll rule per bet for longevity.\n4. Take breaks after 20-minute sessions to reset focus.\n5. Never chase losses — walk away and come back fresh.'
+  }
+};
+
+function openVBot(gameName, gameId) {
+  const data = VBOT_DATA[gameId] || VBOT_DATA.default;
+  const modal = document.getElementById('vbotModal');
+  if (!modal) return;
+  document.getElementById('vbotGameName').textContent = gameName;
+  document.getElementById('vbotHowto').textContent = data.howto;
+  document.getElementById('vbotStrategy').textContent = data.strategy;
+  modal.classList.add('show');
+  playSound('click');
+}
+function closeVBot() { document.getElementById('vbotModal').classList.remove('show'); }
 
 function renderGames() {
   const grid = document.getElementById('allGamesGrid');
@@ -2708,6 +3314,7 @@ function crashBust() {
     cSesPnl -= cPlayerBet.amt; cSesWag += cPlayerBet.amt; cSesBets++;
     recordBet('crash', cPlayerBet.amt, 0, -cPlayerBet.amt);
     addTx('Crash Loss', -cPlayerBet.amt, 'lost');
+    voiceLoss(cPlayerBet.amt);
     toast(`Busted at ${cTarget.toFixed(2)}× — Lost ${fmt(cPlayerBet.amt)} USDT`, 'error');
     updateCrashSessionUI();
   }
@@ -2745,6 +3352,7 @@ function crashCashout() {
   playSound('ching');
   playSound('win');
   winFlashFX();
+  voiceWin(profit);
   toast(`Cashed out at ${cMult.toFixed(2)}× — Won ${fmt(profit)} USDT`, 'success');
   updateCrashBetBtn('cashed');
   updateCrashSessionUI();
@@ -2954,6 +3562,7 @@ function minesTile(idx) {
     updateBalance(-mBet);
     recordBet('mines', mBet, 0, -mBet);
     addTx('Mines Loss', -mBet, 'lost');
+    voiceLoss(mBet);
     toast(`💥 Mine hit! Lost ${fmt(mBet)} USDT`, 'error');
     // Reveal all mines
     let delay = 60;
@@ -3006,6 +3615,7 @@ function minesCashout() {
   playSound('ching');
   playSound('win');
   winFlashFX();
+  voiceWin(profit);
   // Win particles from center
   const arena = document.getElementById('minesArena');
   if (arena) {
@@ -3566,18 +4176,87 @@ const CRYPTO_ADDRS = {
   sol: '9gzfiQC4cT5SCYN1wUXgseTxzYvCvn3VRsro2ryhmvXp'
 };
 
-function showDepositModal() { document.getElementById('depositModal').classList.add('show'); }
-function closeDepositModal() { document.getElementById('depositModal').classList.remove('show'); }
+function showDepositModal() {
+  document.getElementById('depositModal').classList.add('show');
+  // Render QR for default selected coin
+  renderDepositQR(selectedCrypto);
+  startBlockchainFeed();
+}
+function closeDepositModal() {
+  document.getElementById('depositModal').classList.remove('show');
+  stopBlockchainFeed();
+}
 function selectCrypto(c, el) {
   selectedCrypto = c;
   document.querySelectorAll('.crypto-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
-  document.getElementById('depositAddr').textContent = CRYPTO_ADDRS[c] || 'Address not found';
+  renderDepositQR(c);
 }
+
+let _qrInstance = null;
+function renderDepositQR(c) {
+  const addr = CRYPTO_ADDRS[c] || '';
+  document.getElementById('depositAddr').textContent = addr;
+  const box = document.getElementById('qrCodeCanvas');
+  if (!box) return;
+  box.innerHTML = '';
+  if (typeof QRCode !== 'undefined') {
+    try {
+      _qrInstance = new QRCode(box, {
+        text: addr,
+        width: 140,
+        height: 140,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+    } catch(e) {
+      box.innerHTML = `<div style="width:140px;height:140px;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:#666;">${addr.slice(0,12)}…</div>`;
+    }
+  } else {
+    // Fallback: show address as text QR placeholder
+    box.innerHTML = `<div style="width:140px;height:140px;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#333;word-break:break-all;padding:8px;text-align:center;">${addr}</div>`;
+  }
+}
+
 function copyDepositAddr() {
   const addr = CRYPTO_ADDRS[selectedCrypto];
   navigator.clipboard.writeText(addr).catch(() => {});
   toast('Address copied to clipboard! 📋', 'success');
+  // Show payment confirmed animation briefly to build trust
+  setTimeout(() => {
+    const anim = document.getElementById('payConfirmAnim');
+    const qrBox = document.getElementById('qrRealBox');
+    if (anim && qrBox) {
+      qrBox.style.display = 'none'; anim.style.display = 'block';
+      setTimeout(() => { anim.style.display = 'none'; qrBox.style.display = 'flex'; }, 3200);
+    }
+  }, 300);
+}
+
+/* ── Fake Live Blockchain Feed ── */
+const BC_NAMES  = ['Aryan_12','Priya.v','Rahul_K','Sameer99','Rohit.bet','Deepak11','Karan.io','Vikram22','Anjali_x','Yash_23','Meera.v','Nikhil_8'];
+const BC_COINS  = ['USDT TRC20','BTC','SOL','USDT TRC20','USDT TRC20','BTC'];
+const BC_AMTS   = [10,15,20,25,30,50,75,100,12,18];
+let _bcInterval = null;
+function startBlockchainFeed() {
+  const feed = document.getElementById('liveBlockchainFeed');
+  if (!feed) return;
+  feed.innerHTML = '';
+  const addRow = () => {
+    const name = pick(BC_NAMES), coin = pick(BC_COINS), amt = pick(BC_AMTS);
+    const hash = Array.from({length:8},()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+    const row = document.createElement('div');
+    row.className = 'feed-row';
+    row.innerHTML = `<div class="feed-dot"></div><span style="color:var(--green);font-weight:700;">${name}</span><span style="color:var(--text3);">deposited</span><span style="color:var(--gold);font-weight:700;">$${amt}</span><span style="color:var(--text3);">${coin}</span><span style="color:rgba(0,212,255,0.4);font-size:.55rem;">#${hash}</span>`;
+    feed.insertBefore(row, feed.firstChild);
+    if (feed.children.length > 5) feed.removeChild(feed.lastChild);
+  };
+  addRow();
+  _bcInterval = setInterval(addRow, 2800 + Math.random()*1500);
+}
+function stopBlockchainFeed() {
+  clearInterval(_bcInterval);
 }
 
 function showWithdrawModal() { document.getElementById('withdrawModal').classList.add('show'); }
@@ -4045,8 +4724,8 @@ window.addEventListener('DOMContentLoaded', () => {
   renderGames();
 });
 
-/* ══════════════ TRADING MODULE — PRO ══════════════ */
-let tCanvas, tCtx, tCandles = [], tBase = 43250, tOpenDay = 43250;
+/* ══════════════ VTX COIN TRADING MODULE ══════════════ */
+let tCanvas, tCtx, tCandles = [], tBase = 0.4325, tOpenDay = 0.4325;
 let tInterval, tTickerInterval, tTimerInterval;
 let tTimerSecs = 0, tTimerRunning = false;
 let tradeActiveBet = null, tradeRound = parseInt(localStorage.getItem('vx_trade_round')||'1');
@@ -4054,11 +4733,15 @@ let tradeHistory = JSON.parse(localStorage.getItem('vx_trade_hist')||'[]');
 let tradeUnlocked = !!localStorage.getItem('vx_trade_unlocked');
 let tradeFirstAttempt = !tradeUnlocked;
 
+/* VTX House Edge State */
+let vtxUpPool = 0, vtxDownPool = 0;
+let vtxManipActive = false, vtxManipDir = null;
+
 /* Candle state */
 let tCurrentCandle = null;
-const T_CANDLE_TICKS = 20; // ticks per candle
+const T_CANDLE_TICKS = 20;
 let tCandleTick = 0;
-const T_CANDLE_COUNT = 60; // visible candles
+const T_CANDLE_COUNT = 60;
 
 /* Restore active bet */
 try { const ab = JSON.parse(localStorage.getItem('vx_active_trade')||'null'); if(ab) tradeActiveBet = ab; } catch(e){}
@@ -4069,14 +4752,14 @@ function initTradingPage() {
   resizeTradeCanvas();
   window.addEventListener('resize', resizeTradeCanvas);
 
-  // Generate initial candle history
   if (tCandles.length === 0) {
-    let p = 42000 + Math.random()*3000;
+    let p = 0.38 + Math.random()*0.08;
     for (let i = 0; i < T_CANDLE_COUNT; i++) {
       const o = p;
-      const h = o + Math.random()*200;
-      const l = o - Math.random()*200;
-      const change = (Math.random()-.48)*300;
+      const volatility = o * 0.012;
+      const h = o + Math.random()*volatility;
+      const l = o - Math.random()*volatility;
+      const change = (Math.random()-.48)*(o*0.015);
       const c = Math.max(l, Math.min(h, o+change));
       tCandles.push({o,h,l,c});
       p = c;
@@ -4089,38 +4772,260 @@ function initTradingPage() {
   startTradeFeeds();
   drawProChart();
 
-  // Restore active bet UI
   if (tradeActiveBet) restoreActiveBetUI();
 
-  // Hover crosshair
+  // ── Mouse events ──
   tCanvas.addEventListener('mousemove', onChartMouseMove);
-  tCanvas.addEventListener('mouseleave', () => { document.getElementById('chartTooltip').style.display='none'; });
+  tCanvas.addEventListener('mouseleave', () => { const t=document.getElementById('chartTooltip'); if(t)t.style.display='none'; chartDrawMouseUp(); });
+  tCanvas.addEventListener('mousedown', chartDrawMouseDown);
+  tCanvas.addEventListener('mouseup',   chartDrawMouseUp);
 
-  // Signal bot panel
+  // ── Touch events (pinch-zoom + pan + draw) ──
+  tCanvas.addEventListener('touchstart',  chartTouchStart,  {passive:false});
+  tCanvas.addEventListener('touchmove',   chartTouchMove,   {passive:false});
+  tCanvas.addEventListener('touchend',    chartTouchEnd,    {passive:false});
+
   renderSignalBotContent();
   renderTradeHistory();
+  updateVtxPoolDisplay();
+}
+
+/* ══════════════════════════════════════════════════
+   CHART INTERACTION ENGINE
+   Pinch-Zoom · Drag-Pan · Trendlines · Rectangles · H-Lines
+   ══════════════════════════════════════════════════ */
+let chartTool        = 'cursor';   // cursor | trend | rect | hline
+let chartZoomLevel   = 1.0;        // 0.3 – 4.0
+let chartPanOffset   = 0;          // candles panned left (integer)
+let chartDrawings    = [];         // persisted shapes
+let _drawStart       = null;       // {x,y} canvas coords
+let _drawActive      = false;
+let _panActive       = false;
+let _panStartX       = 0;
+let _panStartOff     = 0;
+// Pinch state
+let _pinchDist0      = 0;
+let _pinchZoom0      = 1;
+let _touchCount      = 0;
+
+function setChartTool(tool) {
+  chartTool = tool;
+  document.querySelectorAll('.chart-tool-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('tool-' + tool);
+  if (btn) btn.classList.add('active');
+  tCanvas.style.cursor = tool === 'cursor' ? 'crosshair' : 'crosshair';
+}
+
+function clearChartDrawings() { chartDrawings = []; drawProChart(); }
+function chartZoomIn()    { chartZoomLevel = Math.min(4, chartZoomLevel * 1.25); drawProChart(); }
+function chartZoomOut()   { chartZoomLevel = Math.max(0.3, chartZoomLevel / 1.25); drawProChart(); }
+function chartResetView() { chartZoomLevel = 1; chartPanOffset = 0; drawProChart(); }
+
+/* Canvas-to-price coordinate helpers */
+function canvasToPrice(canvasY) {
+  const dpr = window.devicePixelRatio || 1;
+  const W = tCanvas.width/dpr, H = tCanvas.height/dpr;
+  const pd = {top:20,bottom:30,left:4,right:52};
+  const all = [...tCandles, tCurrentCandle].filter(Boolean);
+  if (!all.length) return tBase;
+  let minP = Math.min(...all.map(c=>c.l));
+  let maxP = Math.max(...all.map(c=>c.h));
+  const pad = (maxP - minP) * 0.1;
+  minP -= pad; maxP += pad;
+  const chartH = H - pd.top - pd.bottom;
+  const ratio = (canvasY - pd.top) / chartH;
+  return maxP - ratio * (maxP - minP);
+}
+function canvasToCandle(canvasX) {
+  const dpr = window.devicePixelRatio || 1;
+  const W = tCanvas.width/dpr;
+  const pd = {left:4,right:52};
+  const visW   = W - pd.left - pd.right;
+  const visCount = Math.round((T_CANDLE_COUNT+1) / chartZoomLevel);
+  const cw = visW / visCount;
+  return Math.floor((canvasX - pd.left) / cw);
+}
+
+/* Mouse drawing */
+function chartDrawMouseDown(e) {
+  const rect = tCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  if (chartTool === 'cursor') {
+    _panActive = true; _panStartX = x; _panStartOff = chartPanOffset;
+    tCanvas.style.cursor = 'grabbing';
+    return;
+  }
+  _drawActive = true;
+  _drawStart  = {x, y, price: canvasToPrice(y)};
+}
+function chartDrawMouseUp(e) {
+  if (_panActive) { _panActive = false; tCanvas.style.cursor = 'crosshair'; return; }
+  if (!_drawActive || !_drawStart || !e) return;
+  _drawActive = false;
+  const rect = tCanvas.getBoundingClientRect();
+  const x2 = e.clientX - rect.left;
+  const y2 = e.clientY - rect.top;
+  if (Math.abs(x2 - _drawStart.x) < 3 && Math.abs(y2 - _drawStart.y) < 3) return; // too small
+  chartDrawings.push({
+    type: chartTool,
+    x1: _drawStart.x / tCanvas.getBoundingClientRect().width,
+    y1: _drawStart.price,
+    x2: x2 / tCanvas.getBoundingClientRect().width,
+    y2: canvasToPrice(y2),
+    color: chartTool==='trend' ? '#00d4ff' : chartTool==='rect' ? 'rgba(123,47,255,0.25)' : '#ffd700'
+  });
+  _drawStart = null;
+  drawProChart();
+}
+
+/* Mouse pan */
+function onChartMouseMovePan(e) {
+  if (!_panActive) return;
+  const rect = tCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const dx = x - _panStartX;
+  const dpr = window.devicePixelRatio || 1;
+  const W = tCanvas.width / dpr;
+  const visCount = Math.round((T_CANDLE_COUNT+1) / chartZoomLevel);
+  const cw = (W - 56) / visCount;
+  chartPanOffset = Math.max(0, Math.min(tCandles.length - visCount, _panStartOff - Math.round(dx / cw)));
+  drawProChart();
+}
+
+/* Touch pinch-zoom + pan */
+function getPinchDist(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+let _lastTouchX = 0;
+function chartTouchStart(e) {
+  e.preventDefault();
+  _touchCount = e.touches.length;
+  if (_touchCount === 2) {
+    _pinchDist0 = getPinchDist(e.touches);
+    _pinchZoom0 = chartZoomLevel;
+  } else if (_touchCount === 1) {
+    _lastTouchX = e.touches[0].clientX;
+    _panStartOff = chartPanOffset;
+  }
+}
+function chartTouchMove(e) {
+  e.preventDefault();
+  if (e.touches.length === 2) {
+    const dist = getPinchDist(e.touches);
+    const ratio = dist / _pinchDist0;
+    chartZoomLevel = Math.max(0.3, Math.min(4, _pinchZoom0 * ratio));
+    drawProChart();
+  } else if (e.touches.length === 1) {
+    if (chartTool !== 'cursor') {
+      // Draw on touch
+      const rect = tCanvas.getBoundingClientRect();
+      const x = e.touches[0].clientX - rect.left;
+      const y = e.touches[0].clientY - rect.top;
+      if (!_drawStart) { _drawStart = {x,y,price:canvasToPrice(y)}; _drawActive=true; return; }
+    }
+    const dx = e.touches[0].clientX - _lastTouchX;
+    _lastTouchX = e.touches[0].clientX;
+    const dpr = window.devicePixelRatio || 1;
+    const W = tCanvas.width / dpr;
+    const visCount = Math.round((T_CANDLE_COUNT+1) / chartZoomLevel);
+    const cw = (W - 56) / visCount;
+    chartPanOffset = Math.max(0, Math.min(tCandles.length - visCount, chartPanOffset - Math.round(dx / cw)));
+    drawProChart();
+  }
+}
+function chartTouchEnd(e) {
+  e.preventDefault();
+  if (_drawActive && _drawStart && e.changedTouches.length) {
+    const rect  = tCanvas.getBoundingClientRect();
+    const x2    = e.changedTouches[0].clientX - rect.left;
+    const y2    = e.changedTouches[0].clientY - rect.top;
+    if (Math.abs(x2 - _drawStart.x) > 8 || Math.abs(y2 - _drawStart.y) > 8) {
+      chartDrawings.push({
+        type: chartTool,
+        x1: _drawStart.x / rect.width,
+        y1: _drawStart.price,
+        x2: x2 / rect.width,
+        y2: canvasToPrice(y2),
+        color: chartTool==='trend' ? '#00d4ff' : chartTool==='rect' ? 'rgba(123,47,255,0.25)' : '#ffd700'
+      });
+    }
+    _drawActive = false; _drawStart = null; drawProChart();
+  }
+  _touchCount = e.touches.length;
 }
 
 function resizeTradeCanvas() {
   if (!tCanvas) return;
   const dpr = window.devicePixelRatio || 1;
   const rect = tCanvas.parentElement.getBoundingClientRect();
+  const h = Math.max(240, Math.min(380, rect.width * 0.55));
   tCanvas.width = rect.width * dpr;
-  tCanvas.height = 280 * dpr;
-  tCanvas.style.height = '280px';
+  tCanvas.height = h * dpr;
+  tCanvas.style.height = h + 'px';
   if (tCtx) tCtx.setTransform(1,0,0,1,0,0);
   tCtx = tCanvas.getContext('2d');
   tCtx.scale(dpr, dpr);
   drawProChart();
 }
 
+/* ─ HOUSE EDGE ALGORITHM ─
+   If UP pool > DOWN pool → price must CRASH (go down)
+   If DOWN pool > UP pool → price must PUMP (go up)
+   Fake noise added regardless for realism
+*/
+function calcVtxManipBias() {
+  if (vtxUpPool === 0 && vtxDownPool === 0) return 0;
+  const total = vtxUpPool + vtxDownPool;
+  if (vtxUpPool > vtxDownPool) {
+    // majority bet UP → house makes price CRASH
+    const strength = Math.min(0.85, (vtxUpPool - vtxDownPool) / total);
+    return -strength; // negative = bearish bias
+  } else {
+    // majority bet DOWN → house makes price PUMP
+    const strength = Math.min(0.85, (vtxDownPool - vtxUpPool) / total);
+    return strength; // positive = bullish bias
+  }
+}
+
 function startTradeFeeds() {
   clearInterval(tInterval); clearInterval(tTickerInterval);
-  // Price tick every 300ms — smooth updates
   tInterval = setInterval(() => {
-    const change = (Math.random()-.488) * (tBase*0.0012);
-    tBase = Math.max(10000, tBase + change);
-    // Update current candle
+    const bias = calcVtxManipBias();
+
+    // ── NEAR-MISS ENGINE ──────────────────────────────────────────
+    // When user has an active UP bet and timer is in last 8 seconds,
+    // steer price to close just below their entry (near-miss loss)
+    let nearMissForce = 0;
+    if (tradeActiveBet && tTimerSecs <= 8 && tTimerSecs > 0) {
+      const entry = tradeActiveBet.entryPrice;
+      if (tradeActiveBet.direction === 'up') {
+        // If price is above entry, push it down fast
+        if (tBase > entry) {
+          nearMissForce = -0.9; // strong push down
+        } else if (tBase >= entry * 0.9995 && tBase < entry) {
+          nearMissForce = -0.4; // keep it just below
+        }
+      } else if (tradeActiveBet.direction === 'down') {
+        // If price is below entry, push it up (near-miss on down bets too)
+        if (tBase < entry) {
+          nearMissForce = 0.9;
+        } else if (tBase <= entry * 1.0005 && tBase > entry) {
+          nearMissForce = 0.4;
+        }
+      }
+    }
+    // ─────────────────────────────────────────────────────────────
+
+    const noise  = (Math.random() - 0.5) * (tBase * 0.003);
+    const manip  = (bias + nearMissForce) * (tBase * 0.006);
+    const micro  = (Math.random() - 0.5) * (tBase * 0.001);
+    const change = noise + manip + micro;
+
+    tBase = Math.max(0.0001, tBase + change);
+
     if (tCurrentCandle) {
       tCurrentCandle.c = tBase;
       tCurrentCandle.h = Math.max(tCurrentCandle.h, tBase);
@@ -4135,7 +5040,6 @@ function startTradeFeeds() {
     }
     updateTickerBar(change);
     drawProChart();
-    // Timer countdown
     if (tTimerRunning && tTimerSecs > 0) {
       tTimerSecs--;
       updateTradeTimerUI();
@@ -4144,13 +5048,20 @@ function startTradeFeeds() {
   }, 300);
 }
 
+function updateVtxPoolDisplay() {
+  const upEl = document.getElementById('vtxUpPool');
+  const dnEl = document.getElementById('vtxDownPool');
+  if (upEl) upEl.textContent = '$' + vtxUpPool.toFixed(2);
+  if (dnEl) dnEl.textContent = '$' + vtxDownPool.toFixed(2);
+}
+
 function updateTickerBar(change) {
   const p = document.getElementById('ttbPrice');
   const ch = document.getElementById('ttbChange');
   const hi = document.getElementById('ttbHigh');
   const lo = document.getElementById('ttbLow');
   if (!p) return;
-  const priceStr = '$' + tBase.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const priceStr = '$' + tBase.toFixed(6);
   p.textContent = priceStr;
   p.style.color = change >= 0 ? 'var(--green)' : 'var(--red)';
   const pct = ((tBase - tOpenDay) / tOpenDay * 100).toFixed(2);
@@ -4159,8 +5070,8 @@ function updateTickerBar(change) {
   ch.className = 'ttb-change ' + (pct >= 0 ? 'up' : 'dn');
   const allPrices = [...tCandles.map(c=>c.h), tBase];
   const allLows   = [...tCandles.map(c=>c.l), tBase];
-  if (hi) hi.textContent = '$'+Math.max(...allPrices).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0});
-  if (lo) lo.textContent = '$'+Math.min(...allLows).toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0});
+  if (hi) hi.textContent = '$'+Math.max(...allPrices).toFixed(6);
+  if (lo) lo.textContent = '$'+Math.min(...allLows).toFixed(6);
 }
 
 const CHART_PAD = { top:18, right:68, bottom:28, left:8 };
@@ -4197,7 +5108,7 @@ function drawProChart() {
     tCtx.lineWidth = 1;
     tCtx.beginPath(); tCtx.moveTo(pd.left,y); tCtx.lineTo(pd.left+cW,y); tCtx.stroke();
     tCtx.fillStyle = 'rgba(180,200,220,0.45)';
-    tCtx.fillText('$'+price.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0}), pd.left+cW+6, y+3.5);
+    tCtx.fillText('$'+price.toFixed(6), pd.left+cW+6, y+3.5);
   }
 
   // Current price line
@@ -4212,7 +5123,7 @@ function drawProChart() {
   tCtx.fillStyle = rising ? 'rgba(0,255,136,.8)' : 'rgba(255,51,102,.8)';
   tCtx.fillRect(priceTagX, curY-9, 65, 18);
   tCtx.fillStyle = '#04060f'; tCtx.textAlign='left';
-  tCtx.fillText('$'+tBase.toLocaleString('en',{minimumFractionDigits:1,maximumFractionDigits:1}), priceTagX+3, curY+4);
+  tCtx.fillText('$'+tBase.toFixed(5), priceTagX+3, curY+4);
 
   // Draw candles
   const candleW = Math.max(2, (cW / allCandles.length) - 1.5);
@@ -4246,13 +5157,58 @@ function drawProChart() {
     tCtx.beginPath(); tCtx.moveTo(pd.left,ey); tCtx.lineTo(pd.left+cW,ey); tCtx.stroke();
     tCtx.setLineDash([]);
     tCtx.fillStyle='rgba(255,215,0,.8)'; tCtx.textAlign='left';
-    tCtx.fillText('Entry $'+tradeActiveBet.entryPrice.toFixed(0), pd.left+4, ey-4);
+    tCtx.fillText('Entry $'+tradeActiveBet.entryPrice.toFixed(6), pd.left+4, ey-4);
   }
+
+  // ── Render user drawings ──
+  renderChartDrawings(W, H, pd, cW, toY);
 
   tCtx.textAlign = 'left';
 }
 
+function renderChartDrawings(W, H, pd, cW, toY) {
+  if (!chartDrawings.length || !tCtx) return;
+  chartDrawings.forEach(d => {
+    const x1 = d.x1 * W;
+    const x2 = d.x2 * W;
+    const y1 = toY(d.y1);
+    const y2 = toY(d.y2);
+    tCtx.save();
+    if (d.type === 'trend') {
+      tCtx.strokeStyle = d.color; tCtx.lineWidth = 1.5;
+      tCtx.setLineDash([]);
+      tCtx.shadowColor = d.color; tCtx.shadowBlur = 4;
+      tCtx.beginPath(); tCtx.moveTo(x1,y1); tCtx.lineTo(x2,y2); tCtx.stroke();
+      // Arrow head
+      const angle = Math.atan2(y2-y1, x2-x1);
+      const al = 8;
+      tCtx.beginPath();
+      tCtx.moveTo(x2, y2);
+      tCtx.lineTo(x2 - al*Math.cos(angle-0.4), y2 - al*Math.sin(angle-0.4));
+      tCtx.lineTo(x2 - al*Math.cos(angle+0.4), y2 - al*Math.sin(angle+0.4));
+      tCtx.closePath(); tCtx.fillStyle = d.color; tCtx.fill();
+    } else if (d.type === 'rect') {
+      tCtx.fillStyle   = d.color;
+      tCtx.strokeStyle = 'rgba(123,47,255,0.7)'; tCtx.lineWidth = 1.5;
+      tCtx.fillRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+      tCtx.strokeRect(Math.min(x1,x2), Math.min(y1,y2), Math.abs(x2-x1), Math.abs(y2-y1));
+    } else if (d.type === 'hline') {
+      const yh = y1; // horizontal at entry price
+      tCtx.strokeStyle = d.color; tCtx.lineWidth = 1;
+      tCtx.setLineDash([5,4]);
+      tCtx.shadowColor = d.color; tCtx.shadowBlur = 3;
+      tCtx.beginPath(); tCtx.moveTo(pd.left, yh); tCtx.lineTo(pd.left+cW, yh); tCtx.stroke();
+      tCtx.setLineDash([]);
+      tCtx.fillStyle = d.color; tCtx.font = '10px monospace'; tCtx.textAlign='right';
+      tCtx.fillText('$'+d.y1.toFixed(5), pd.left+cW-2, yh-3);
+    }
+    tCtx.restore();
+  });
+}
+
 function onChartMouseMove(e) {
+  // Pan when cursor tool + mousedown
+  if (_panActive) { onChartMouseMovePan(e); return; }
   if (!tCtx || !tCanvas) return;
   const dpr = window.devicePixelRatio||1;
   const W = tCanvas.width/dpr, H = tCanvas.height/dpr;
@@ -4286,7 +5242,7 @@ function updateTradeTimerUI() {
   }
   if (line && tradeActiveBet) {
     const dir = tradeActiveBet.direction==='up'?'▲ UP':'▼ DOWN';
-    line.textContent = `${dir} @ $${tradeActiveBet.entryPrice.toFixed(2)} · ${tTimerSecs}s remaining`;
+    line.textContent = `${dir} @ $${tradeActiveBet.entryPrice.toFixed(6)} · ${tTimerSecs}s remaining`;
   }
 }
 
@@ -4298,6 +5254,9 @@ function placeTradeBet(direction) {
   updateBalance(-amt);
   tradeActiveBet = { direction, amt, entryPrice:tBase, round:tradeRound };
   localStorage.setItem('vx_active_trade', JSON.stringify(tradeActiveBet));
+  // Update pool trackers for house edge
+  if (direction === 'up') { vtxUpPool += amt; } else { vtxDownPool += amt; }
+  updateVtxPoolDisplay();
   // Start countdown (60 seconds per round)
   tTimerSecs = 60; tTimerRunning = true;
   updateTradeTimerUI();
@@ -4305,8 +5264,8 @@ function placeTradeBet(direction) {
   const ub=document.getElementById('tradeUpBtn'), db=document.getElementById('tradeDownBtn');
   if(ub)ub.disabled=true; if(db)db.disabled=true;
   const actEl = document.getElementById('tradeActiveBet');
-  if (actEl) { actEl.style.display=''; actEl.innerHTML=`<span style="color:${direction==='up'?'var(--green)':'var(--red)'};">${direction==='up'?'▲':'▼'} ${direction.toUpperCase()}</span> &nbsp;@ $${tBase.toFixed(2)} &nbsp;·&nbsp; ${fmt(amt)} USDT`; }
-  toast(`${direction==='up'?'▲':'▼'} ${direction.toUpperCase()} — trade started! 60s countdown.`, direction==='up'?'success':'error');
+  if (actEl) { actEl.style.display=''; actEl.innerHTML=`<span style="color:${direction==='up'?'var(--green)':'var(--red)'};">${direction==='up'?'▲':'▼'} ${direction.toUpperCase()}</span> &nbsp;@ $${tBase.toFixed(6)} &nbsp;·&nbsp; ${fmt(amt)} USDT`; }
+  toast(`${direction==='up'?'▲':'▼'} ${direction.toUpperCase()} — VTX trade started! 60s countdown.`, direction==='up'?'success':'error');
 }
 
 function restoreActiveBetUI() {
@@ -4321,28 +5280,84 @@ function endTradingRound() {
   tTimerRunning = false; tTimerSecs = 0;
   const startP = tradeActiveBet?.entryPrice || tBase;
   const endP   = tBase;
-  const went = endP >= startP ? 'up' : 'down';
+  const went   = endP >= startP ? 'up' : 'down';
   let pnl = 0;
   if (tradeActiveBet) {
     const won = tradeActiveBet.direction === went;
-    pnl = won ? +(tradeActiveBet.amt*0.95).toFixed(2) : -tradeActiveBet.amt;
+    pnl = won ? +(tradeActiveBet.amt * 0.95).toFixed(2) : -tradeActiveBet.amt;
     updateBalance(won ? tradeActiveBet.amt + pnl : 0);
-    addTx(won?'Trade Win':'Trade Loss', pnl, won?'won':'lost');
-    const msg = won ? `✅ Trade WON +${fmt(pnl)} USDT` : `❌ Trade LOST ${fmt(tradeActiveBet.amt)} USDT`;
-    toast(msg, won?'success':'error', 4500);
-    tradeHistory.unshift({round:tradeRound,dir:tradeActiveBet.direction,entry:tradeActiveBet.entryPrice.toFixed(2),exit:endP.toFixed(2),pnl,won});
-    if (tradeHistory.length>20) tradeHistory.pop();
+    addTx(won ? 'Trade Win' : 'Trade Loss', pnl, won ? 'won' : 'lost');
+    if (won) voiceWin(pnl); else voiceLoss(tradeActiveBet.amt);
+    const msg = won
+      ? `✅ Trade WON +${fmt(pnl)} USDT`
+      : `❌ Trade LOST ${fmt(tradeActiveBet.amt)} USDT`;
+    toast(msg, won ? 'success' : 'error', 4500);
+    tradeHistory.unshift({round:tradeRound, dir:tradeActiveBet.direction, entry:startP.toFixed(6), exit:endP.toFixed(6), pnl, won});
+    if (tradeHistory.length > 20) tradeHistory.pop();
     localStorage.setItem('vx_trade_hist', JSON.stringify(tradeHistory));
     renderTradeHistory();
+
+    // ── V-BOT LOSS COACH ─────────────────────────────────────────
+    if (!won) {
+      const lostAmt = tradeActiveBet.amt;
+      const suggest = (lostAmt * 2).toFixed(0);
+      const recover = (lostAmt * 2 * 0.95).toFixed(2);
+      setTimeout(() => showVBotCoach(lostAmt, suggest, recover), 900);
+    }
+    // ─────────────────────────────────────────────────────────────
   }
-  tradeRound++; localStorage.setItem('vx_trade_round', tradeRound);
-  tradeActiveBet = null; localStorage.removeItem('vx_active_trade');
+  tradeRound++;
+  localStorage.setItem('vx_trade_round', tradeRound);
+  tradeActiveBet = null;
+  localStorage.removeItem('vx_active_trade');
+  vtxUpPool = 0; vtxDownPool = 0; updateVtxPoolDisplay();
   const ub=document.getElementById('tradeUpBtn'), db=document.getElementById('tradeDownBtn');
-  if(ub)ub.disabled=false; if(db)db.disabled=false;
-  const actEl=document.getElementById('tradeActiveBet'); if(actEl)actEl.style.display='none';
-  const badge=document.getElementById('tradeTimerBadge'); if(badge)badge.className='trade-timer-badge';
-  const disp=document.getElementById('tradeTimerDisp'); if(disp)disp.textContent='Waiting';
-  const line=document.getElementById('tradeStatusLine'); if(line)line.textContent='Place a bet to start the round';
+  if(ub) ub.disabled=false;
+  if(db) db.disabled=false;
+  const actEl = document.getElementById('tradeActiveBet'); if(actEl) actEl.style.display='none';
+  const badge  = document.getElementById('tradeTimerBadge'); if(badge)  badge.className='trade-timer-badge';
+  const disp   = document.getElementById('tradeTimerDisp');  if(disp)   disp.textContent='Waiting';
+  const line   = document.getElementById('tradeStatusLine'); if(line)   line.textContent='Place a bet to start the round';
+}
+
+/* ── V-BOT LOSS COACH ── */
+function showVBotCoach(lostAmt, suggest, recover) {
+  const existing = document.getElementById('vbotCoachModal');
+  if (existing) existing.remove();
+  const msgs = [
+    `So close! VTX is recovering right now. Try $${suggest} to get $${recover} back instantly! 🚀`,
+    `Near miss! The chart just reversed. Double to $${suggest} on the next candle — recover $${recover}! ⚡`,
+    `The algorithm favors you on the rebound. $${suggest} now = $${recover} profit. Don't miss it! 💎`,
+    `VTX is coiling for a breakout. Smart players go $${suggest} here to recover fast. 🎯`,
+  ];
+  const msg = msgs[Math.floor(Math.random() * msgs.length)];
+  const modal = document.createElement('div');
+  modal.id = 'vbotCoachModal';
+  modal.innerHTML = `
+    <div style="position:fixed;inset:0;z-index:9999;display:flex;align-items:flex-end;justify-content:center;padding:0 0 80px;">
+      <div style="background:linear-gradient(135deg,#0a1a0a,#041410);border:1px solid rgba(0,255,136,0.4);border-radius:16px;padding:18px 20px;max-width:340px;width:92%;box-shadow:0 0 40px rgba(0,255,136,0.15),0 8px 32px rgba(0,0,0,0.8);animation:coach-slide 0.4s ease;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#00d4ff);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;animation:vbot-pulse 2s infinite;">🤖</div>
+          <div>
+            <div style="font-size:.65rem;color:var(--text3);font-family:'JetBrains Mono',monospace;letter-spacing:.04em;">V-BOT COACH</div>
+            <div style="font-size:.72rem;font-weight:700;color:#00ff88;">Recovery Signal Active</div>
+          </div>
+          <button onclick="document.getElementById('vbotCoachModal').remove()" style="margin-left:auto;background:none;border:none;color:var(--text3);font-size:1.2rem;cursor:pointer;padding:0 4px;">✕</button>
+        </div>
+        <p style="font-size:.78rem;color:var(--text1);line-height:1.55;margin:0 0 14px;">${msg}</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button onclick="setTradeAmt(${suggest});document.getElementById('vbotCoachModal').remove();" style="padding:9px;background:linear-gradient(135deg,rgba(0,255,136,.15),rgba(0,212,255,.1));border:1px solid rgba(0,255,136,.4);border-radius:10px;color:#00ff88;font-size:.75rem;font-weight:700;cursor:pointer;">⚡ Bet $${suggest}</button>
+          <button onclick="document.getElementById('vbotCoachModal').remove()" style="padding:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--text3);font-size:.75rem;cursor:pointer;">Maybe Later</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  setTimeout(() => { try { modal.remove(); } catch(e){} }, 9000);
+}
+function setTradeAmt(v) {
+  const i = document.getElementById('tradeBetAmt');
+  if(i) i.value = v;
 }
 
 function renderTradeHistory() {
@@ -4483,12 +5498,27 @@ let tokenBalance = 0;
 let ytBountySubmitted = false, bcTaskSubmitted = false;
 let totalReferrals = parseInt(localStorage.getItem('vx_referrals') || '0');
 
+function getUniqueReferralCode() {
+  let code = localStorage.getItem('vx_ref_code');
+  if (!code) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    code = 'VTX-' + Array.from({length:8}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    localStorage.setItem('vx_ref_code', code);
+  }
+  return code;
+}
+
 function renderEarnPage() {
   tokenBalance = parseInt(localStorage.getItem('vx_tokens') || '0');
   const tb = document.getElementById('tokenBalDisp');
   if (tb) tb.textContent = tokenBalance.toLocaleString();
+  // Generate & persist unique referral code
+  const refCode = getUniqueReferralCode();
+  const refLink = 'https://vortex.io/ref/' + refCode;
   const refEl = document.getElementById('referralLinkDisp');
-  if (refEl) refEl.textContent = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  if (refEl) refEl.textContent = refLink;
+  // Restore saved referral count
+  totalReferrals = parseInt(localStorage.getItem('vx_referrals') || '0');
   const tr = document.getElementById('totalReferrals');
   if (tr) tr.textContent = totalReferrals;
   const re = document.getElementById('referralEarned');
@@ -4513,12 +5543,11 @@ function renderEarnPage() {
 }
 
 function copyReferralLink() {
-  const link = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  const link = 'https://vortex.io/ref/' + getUniqueReferralCode();
   navigator.clipboard.writeText(link).catch(()=>{});
   toast('📋 Referral link copied!', 'success');
-  // Simulate referral credit
   totalReferrals++;
-  tokenBalance += 75; // $0.75 = 75 tokens
+  tokenBalance += 75;
   localStorage.setItem('vx_tokens', tokenBalance);
   localStorage.setItem('vx_referrals', totalReferrals);
   toast('🎉 +75 tokens earned for sharing!', 'gold', 3000);
@@ -4526,7 +5555,7 @@ function copyReferralLink() {
 }
 
 function shareReferral() {
-  const link = 'https://vortex.io/ref/' + (currentUser?.name?.replace(/\s+/g,'') || 'player').toLowerCase();
+  const link = 'https://vortex.io/ref/' + getUniqueReferralCode();
   if (navigator.share) navigator.share({ title: 'Join Vortex.IO', text: 'Play & earn crypto at Vortex.IO!', url: link });
   else { navigator.clipboard.writeText(link).catch(()=>{}); toast('Link copied — share it anywhere!', 'success'); }
 }
@@ -4773,6 +5802,67 @@ document.addEventListener('keydown', e => {
 });
 
 </script>
+
+<!-- ══════════════ AI V-BOT MODAL ══════════════ -->
+<div class="overlay" id="vbotModal" style="z-index:3500;">
+  <div class="modal" style="max-width:380px;">
+    <div class="modal-header" style="background:linear-gradient(90deg,rgba(0,212,255,0.12),rgba(123,47,255,0.1));">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:rgba(0,212,255,0.15);border:1px solid rgba(0,212,255,0.4);display:flex;align-items:center;justify-content:center;animation:vbot-pulse 1.5s ease-in-out infinite;">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#00d4ff" stroke-width="2" style="filter:drop-shadow(0 0 6px #00d4ff);"><rect x="7" y="11" width="10" height="9" rx="2"/><path d="M12 11V8"/><circle cx="12" cy="6" r="2"/><circle cx="9.5" cy="14.5" r="1" fill="#00d4ff"/><circle cx="14.5" cy="14.5" r="1" fill="#00d4ff"/><path d="M9.5 18h5"/></svg>
+        </div>
+        <div>
+          <div class="modal-title">AI V-Bot Agent</div>
+          <div style="font-size:.65rem;color:rgba(0,212,255,.5);letter-spacing:.05em;" id="vbotGameName">Loading...</div>
+        </div>
+      </div>
+      <div class="modal-close" onclick="closeVBot()">✕</div>
+    </div>
+    <div class="modal-body" style="padding:18px;">
+      <div style="background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:var(--r);padding:12px;margin-bottom:14px;">
+        <div style="font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--neon);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#00d4ff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          HOW TO PLAY
+        </div>
+        <div style="font-size:.8rem;color:var(--text2);line-height:1.65;" id="vbotHowto"></div>
+      </div>
+      <div style="background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.15);border-radius:var(--r);padding:12px;">
+        <div style="font-family:var(--font-d);font-size:.72rem;font-weight:700;color:var(--green);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#00ff88" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          WINNING STRATEGY
+        </div>
+        <div style="font-size:.78rem;color:var(--text2);line-height:1.7;white-space:pre-line;" id="vbotStrategy"></div>
+      </div>
+      <div style="margin-top:12px;font-size:.65rem;color:var(--text3);text-align:center;">⚠️ AI strategies are informational only. Always gamble responsibly.</div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes vbot-pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,0.4);}50%{box-shadow:0 0 0 6px rgba(0,212,255,0);}}
+@keyframes coach-slide{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes gc-blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+/* Featured game cards */
+.feat-card{
+  flex-shrink:0;width:130px;background:radial-gradient(ellipse at 40% 20%,rgba(var(--fc-rgb,0,212,255),.08) 0%,rgba(2,4,12,0.95) 70%);
+  border:1px solid color-mix(in srgb,var(--fc,#00d4ff) 35%,transparent);
+  border-radius:16px;padding:14px 10px 12px;display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;transition:all .2s;text-align:center;position:relative;overflow:hidden;
+}
+.feat-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,color-mix(in srgb,var(--fc,#00d4ff) 12%,transparent) 0%,transparent 65%);pointer-events:none;}
+.feat-card:hover{transform:translateY(-4px) scale(1.03);border-color:var(--fc,#00d4ff);box-shadow:0 8px 30px color-mix(in srgb,var(--fc,#00d4ff) 25%,transparent),0 0 0 1px color-mix(in srgb,var(--fc,#00d4ff) 20%,transparent);}
+.feat-icon{width:74px;height:74px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.feat-name{font-family:var(--font-d);font-size:.7rem;font-weight:700;color:var(--text1);line-height:1.2;}
+.feat-sub{font-size:.58rem;color:var(--fc,#00d4ff);margin-top:3px;opacity:.8;}
+/* Crypto balance panel items */
+.cbal-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background .15s;border-bottom:1px solid rgba(255,255,255,0.04);}
+.cbal-item:hover{background:rgba(255,45,206,0.08);}
+.cbal-item.active{background:rgba(160,32,240,0.12);}
+.cbal-coin{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.cbal-info{flex:1;min-width:0;}
+.cbal-name{font-size:.72rem;font-weight:700;color:var(--text1);}
+.cbal-rate{font-size:.58rem;color:var(--text3);font-family:var(--font-m);}
+.cbal-val{font-size:.7rem;font-family:var(--font-m);color:var(--neon);text-align:right;}
+</style>
 
 <!-- ══════════════ VIP GALLERY (Secret: type VORTEX69 in chat) ══════════════ -->
 <div class="vip-gallery-overlay" id="vipGallery" style="display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,0.92);backdrop-filter:blur(20px);overflow-y:auto;padding:20px;">
