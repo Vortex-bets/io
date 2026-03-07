@@ -2428,6 +2428,38 @@ input[type=number], input[type=text], input[type=email] {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
+<!-- ═══════════ VORTEX TOP AD UNIT ═══════════ -->
+<div id='vortex-top-ad' style='width:100%; text-align:center; padding:10px 0; background:rgba(0,0,0,0.9); border-bottom:2px solid #00f3ff; box-shadow:0 0 15px #00f3ff; position:relative; z-index:99999;'>
+<iframe 
+  data-aa='2429719' 
+  src='https://acceptable.a-ads.com/2429719/?size=Adaptive' 
+  style='border:0; padding:0; margin:0; width:100%; height:100%; overflow:hidden; background-color:transparent;'
+  sandbox='allow-same-origin allow-scripts allow-popups allow-forms'
+  loading='lazy'>
+</iframe>
+<script type='text/javascript'>
+(function(){
+  var frameRetry = 0;
+  function checkAdFrame(){
+    var frame = document.querySelector('#vortex-top-ad iframe');
+    if(!frame || !frame.contentDocument){
+      frameRetry++;
+      if(frameRetry < 5){
+        setTimeout(checkAdFrame, 1000);
+      }
+    }
+  }
+  setTimeout(checkAdFrame, 500);
+  if(typeof window.a_ads==='undefined'){
+    var script = document.createElement('script');
+    script.src = 'https://acceptable.a-ads.com/show.js';
+    script.async = true;
+    document.head.appendChild(script);
+  }
+})();
+</script>
+</div>
+
 <!-- ═══════════ HYPER-REALISTIC VORTEX MESH GRADIENT ═══════════ -->
 <canvas id="meshGradientCanvas"></canvas>
 <script>
@@ -2478,9 +2510,11 @@ input[type=number], input[type=text], input[type=email] {
  const radius = Math.min(W,H) * orb.r;
  const grd = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
  const [r,g,b] = orb.rgb;
- grd.addColorStop(0, `rgba(${r},${g},${b},${orb.alpha})`);
- grd.addColorStop(0.45, `rgba(${r},${g},${b},${(orb.alpha*0.4).toFixed(3)})`);
- grd.addColorStop(1, `rgba(${r},${g},${b},0)`);
+ const a1 = Math.max(0, Math.min(1, orb.alpha)).toString();
+ const a2 = Math.max(0, Math.min(1, orb.alpha*0.4)).toString();
+ grd.addColorStop(0, 'rgba('+r+','+g+','+b+','+a1+')');
+ grd.addColorStop(0.45, 'rgba('+r+','+g+','+b+','+a2+')');
+ grd.addColorStop(1, 'rgba('+r+','+g+','+b+',0)');
  ctx.globalCompositeOperation = 'screen';
  ctx.beginPath();
  ctx.arc(cx, cy, radius, 0, Math.PI*2);
@@ -2489,7 +2523,7 @@ input[type=number], input[type=text], input[type=email] {
  }
  ctx.globalCompositeOperation = 'multiply';
  const vig = ctx.createRadialGradient(W/2,H/2,0, W/2,H/2, Math.min(W,H)*0.85);
- vig.addColorStop(0,'rgba(4,6,15,0.0)');
+ vig.addColorStop(0,'rgba(4,6,15,0)');
  vig.addColorStop(0.55,'rgba(4,6,15,0.3)');
  vig.addColorStop(1,'rgba(4,6,15,0.82)');
  ctx.fillStyle = vig;
@@ -5073,6 +5107,16 @@ input[type=number], input[type=text], input[type=email] {
 ════════════════════════════════════════════════════ */
 
 /* ─── STATE ─── */
+/* ═══════════ UNIVERSAL HEX COLOR CONVERTER ═══════════ */
+function hexToRgba(hex, alpha) {
+  var h = hex.replace(/^#/, '');
+  var r = parseInt(h.substr(0, 2), 16);
+  var g = parseInt(h.substr(2, 2), 16);
+  var b = parseInt(h.substr(4, 2), 16);
+  alpha = (alpha !== undefined) ? alpha : 1;
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
 let balance = 120333.57;
 let isLoggedIn = false;
 let currentUser = null;
@@ -7000,7 +7044,7 @@ function drawSingularity() {
  singCtx.clearRect(0, 0, singCanvas.width, singCanvas.height);
  // Black hole center
  const bhGrad = singCtx.createRadialGradient(cx, cy, 0, cx, cy, R * 0.22);
- bhGrad.addColorStop(0, '#000'); bhGrad.addColorStop(0.6, '#0a0020'); bhGrad.addColorStop(1, 'rgba(0,0,0,0)');
+ bhGrad.addColorStop(0, 'rgb(0,0,0)'); bhGrad.addColorStop(0.6, 'rgb(10,0,32)'); bhGrad.addColorStop(1, 'rgba(0,0,0,0)');
  singCtx.beginPath(); singCtx.arc(cx, cy, R * 0.22, 0, Math.PI * 2);
  singCtx.fillStyle = bhGrad; singCtx.fill();
  // Swirl rings
@@ -7185,7 +7229,7 @@ function drawRush(elapsed = 0) {
  rushObstacles.forEach(ob => {
  const ox = ob.x * W, oy = (ob.y - ob.h / 2) * H, oh = ob.h * H;
  const g = rushCtx.createLinearGradient(ox, oy, ox, oy + oh);
- g.addColorStop(0, '#ff3366'); g.addColorStop(1, '#7b2fff');
+ g.addColorStop(0, 'rgba(255,51,102,1)'); g.addColorStop(1, 'rgba(123,47,255,1)');
  rushCtx.fillStyle = g; rushCtx.fillRect(ox - 8, oy, 16, oh);
  rushCtx.strokeStyle = '#ff3366'; rushCtx.lineWidth = 1;
  rushCtx.shadowColor = '#ff3366'; rushCtx.shadowBlur = 12;
@@ -7200,7 +7244,7 @@ function drawRush(elapsed = 0) {
  rushCtx.lineTo(px - 8, py + 10);
  rushCtx.closePath();
  const sg = rushCtx.createLinearGradient(px - 8, py, px + 18, py);
- sg.addColorStop(0, '#7b2fff'); sg.addColorStop(1, '#00d4ff');
+ sg.addColorStop(0, 'rgba(123,47,255,1)'); sg.addColorStop(1, 'rgba(0,212,255,1)');
  rushCtx.fillStyle = sg;
  rushCtx.shadowColor = '#00d4ff'; rushCtx.shadowBlur = 20; rushCtx.fill(); rushCtx.shadowBlur = 0;
  // Engine trail
@@ -7286,7 +7330,7 @@ function drawRoulette() {
  // Center
  rCtx.beginPath(); rCtx.arc(cx, cy, 18, 0, Math.PI * 2);
  const cg = rCtx.createRadialGradient(cx, cy, 0, cx, cy, 18);
- cg.addColorStop(0, '#00d4ff'); cg.addColorStop(1, '#7b2fff');
+ cg.addColorStop(0, 'rgba(0,212,255,1)'); cg.addColorStop(1, 'rgba(123,47,255,1)');
  rCtx.fillStyle = cg; rCtx.fill();
  rCtx.fillStyle = 'white'; rCtx.font = 'bold 10px Orbitron'; rCtx.textAlign = 'center'; rCtx.textBaseline = 'middle';
  rCtx.fillText('V', cx, cy);
@@ -7484,9 +7528,9 @@ function drawDie(ctx, val, t, isLit, accentHue) {
 
     /* Dot body */
     var dfill=ctx.createRadialGradient(dx-dotR*.3,dy-dotR*.3,0, dx,dy,dotR);
-    dfill.addColorStop(0,isLit?'hsl('+(accentHue+40)+',100%,95%)':'#eef2ff');
-    dfill.addColorStop(0.5,isLit?'hsl('+accentHue+',100%,72%)':'#aab8e0');
-    dfill.addColorStop(1,isLit?'hsl('+accentHue+',90%,30%)':'#3a4580');
+    dfill.addColorStop(0,isLit?'hsl('+(accentHue+40)+',100%,95%)':'rgb(238,242,255)');
+    dfill.addColorStop(0.5,isLit?'hsl('+accentHue+',100%,72%)':'rgb(170,184,224)');
+    dfill.addColorStop(1,isLit?'hsl('+accentHue+',90%,30%)':'rgb(58,69,128)');
     ctx.beginPath(); ctx.arc(dx,dy,dotR,0,Math.PI*2);
     ctx.fillStyle=dfill; ctx.fill();
 
@@ -7803,9 +7847,9 @@ function initCanvas(){
 function drawBg(ctx,W,H,t){
   /* Vortex storm background */
   var bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#08002a');
-  bg.addColorStop(0.5,'#030010');
-  bg.addColorStop(1,'#0a0028');
+  bg.addColorStop(0,'rgb(8,0,42)');
+  bg.addColorStop(0.5,'rgb(3,0,16)');
+  bg.addColorStop(1,'rgb(10,0,40)');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
   /* Animated vortex rings */
@@ -8285,7 +8329,7 @@ function renderPlinko(){
 
   /* BG */
   var bg=ctx.createLinearGradient(0,0,0,H);
-  bg.addColorStop(0,'#020810'); bg.addColorStop(.5,'#01040a'); bg.addColorStop(1,'#030c14');
+  bg.addColorStop(0,'rgb(2,8,16)'); bg.addColorStop(.5,'rgb(1,4,10)'); bg.addColorStop(1,'rgb(3,12,20)');
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
   /* Grid lines */
@@ -8303,7 +8347,7 @@ function renderPlinko(){
     var col=b.color;
     /* Bucket body */
     var bg2=ctx.createLinearGradient(b.x,b.y,b.x,b.y+b.h);
-    bg2.addColorStop(0,col.replace(')',',0.22)').replace('rgb','rgba').replace('#','')); // simplified
+    bg2.addColorStop(0,hexAlpha(col,0.22));
     ctx.fillStyle=hexAlpha(col,.18+pulse*.06); ctx.fillRect(b.x+1,b.y,b.w-2,b.h);
     ctx.strokeStyle=col; ctx.lineWidth=1.5;
     ctx.shadowBlur=8+pulse*8; ctx.shadowColor=col;
@@ -11313,9 +11357,9 @@ function drawSpin(angle) {
 
  // Center hub
  const hubGrad = ctx.createRadialGradient(_spinCX,_spinCY,0,_spinCX,_spinCY,28);
- hubGrad.addColorStop(0,'#c084fc');
- hubGrad.addColorStop(0.5,'#7b2fff');
- hubGrad.addColorStop(1,'#3d0099');
+ hubGrad.addColorStop(0,'rgb(192,132,252)');
+ hubGrad.addColorStop(0.5,'rgb(123,47,255)');
+ hubGrad.addColorStop(1,'rgb(61,0,153)');
  ctx.beginPath(); ctx.arc(_spinCX,_spinCY,28,0,Math.PI*2);
  ctx.fillStyle = hubGrad;
  ctx.shadowColor = '#c084fc'; ctx.shadowBlur = 18;
@@ -13343,7 +13387,7 @@ function drawVCE(){
 
  // Deep space bg
  var bg=ctx.createRadialGradient(cx,cy*0.65,0,cx,cy,S*0.5);
- bg.addColorStop(0,'#071228');bg.addColorStop(0.6,'#030a18');bg.addColorStop(1,'#010408');
+ bg.addColorStop(0,'rgb(7,18,40)');bg.addColorStop(0.6,'rgb(3,10,24)');bg.addColorStop(1,'rgb(1,4,8)');
  ctx.beginPath();ctx.arc(cx,cy,S*0.494,0,Math.PI*2);ctx.fillStyle=bg;ctx.fill();
  ctx.beginPath();ctx.arc(cx,cy,S*0.492,0,Math.PI*2);
  ctx.strokeStyle='rgba(0,212,255,0.1)';ctx.lineWidth=1;ctx.stroke();
@@ -13456,7 +13500,7 @@ function drawVCE(){
 function drawCenterOrb(ctx,cx,cy,S){
  var r=S/2*0.22;
  var cg=ctx.createRadialGradient(cx-r*0.2,cy-r*0.22,0,cx,cy,r*1.1);
- cg.addColorStop(0,'#0e2040');cg.addColorStop(0.5,'#060e1c');cg.addColorStop(1,'#020710');
+ cg.addColorStop(0,'rgb(14,32,64)');cg.addColorStop(0.5,'rgb(6,14,28)');cg.addColorStop(1,'rgb(2,7,16)');
  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
  ctx.strokeStyle='rgba(0,212,255,0.25)';ctx.lineWidth=1.5;ctx.stroke();
 
