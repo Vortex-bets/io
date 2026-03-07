@@ -537,11 +537,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .app-layout.no-fomo{padding-top:var(--header);}
 .main-area{flex:1;min-width:0;padding-bottom:calc(var(--nav-h) + 8px);}
 @media(min-width:768px){.main-area{margin-left:var(--sidebar);padding-bottom:24px;}}
-.page{display:none;padding:14px;max-width:1200px;margin:0 auto;}
-.page.active{display:block;animation:pg-in .25s ease;}
-@keyframes pg-in{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-@media(min-width:768px){.page{padding:22px 24px;}}
-@media(min-width:1024px){.page{padding:28px 32px;}}
+.page{display:none;padding:10px;max-width:100%;margin:0 auto;}
+.page.active{display:block;animation:pg-slide-in .3s cubic-bezier(.22,.68,0,1.2) both;}
+
+@media(min-width:768px){.page{padding:16px 18px;}}
+@media(min-width:1024px){.page{padding:18px 22px;}}
 
 /* ─── CARDS ─── */
 .card{
@@ -601,104 +601,149 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 /* ══════════════════════════════════════════
    BC.GAME ORIGINALS GRID — 4 COLUMNS
    ══════════════════════════════════════════ */
+/* ════ VORTEX 3D HYPER-REALISM GRID ════ */
 .games-grid{
  display:grid;
  grid-template-columns:repeat(2,1fr);
- gap:10px;
+ gap:8px;padding:0;
 }
-@media(min-width:480px){.games-grid{grid-template-columns:repeat(3,1fr);gap:10px;}}
-@media(min-width:700px){.games-grid{grid-template-columns:repeat(4,1fr);gap:12px;}}
-@media(min-width:1024px){.games-grid{grid-template-columns:repeat(4,1fr);gap:14px;}}
-@media(min-width:1280px){.games-grid{grid-template-columns:repeat(5,1fr);gap:14px;}}
+@media(min-width:480px){.games-grid{grid-template-columns:repeat(3,1fr);gap:9px;}}
+@media(min-width:700px){.games-grid{grid-template-columns:repeat(4,1fr);gap:10px;}}
+@media(min-width:1024px){.games-grid{grid-template-columns:repeat(4,1fr);gap:12px;}}
+@media(min-width:1280px){.games-grid{grid-template-columns:repeat(5,1fr);gap:12px;}}
+@media(min-width:1600px){.games-grid{grid-template-columns:repeat(6,1fr);gap:12px;}}
 
-/* BC.Game-style card — tall with colored gradient bg */
+/* ── 3D CARD ── */
 .game-card{
  border-radius:16px;overflow:hidden;cursor:pointer;
- background:linear-gradient(160deg,#0d1228 0%,#070a18 100%);
- border:1px solid rgba(255,255,255,.09);
- transition:transform .22s cubic-bezier(.34,1.56,.64,1),border-color .18s,box-shadow .18s,filter .18s;
+ background:linear-gradient(160deg,#0e1328 0%,#060918 100%);
+ border:1px solid rgba(255,255,255,.12);
  position:relative;
- box-shadow:0 4px 22px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4);
+ transform-style:preserve-3d;
  will-change:transform;
+ box-shadow:
+  0 2px 4px rgba(0,0,0,.85),
+  0 8px 24px rgba(0,0,0,.72),
+  0 20px 50px rgba(0,0,0,.5),
+  inset 0 1px 0 rgba(255,255,255,.09),
+  inset 0 -1px 0 rgba(0,0,0,.5);
 }
+/* Specular top highlight — overhead casino lighting */
 .game-card::before{
- content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;
- background:linear-gradient(180deg,rgba(255,255,255,.045) 0%,transparent 55%);
- z-index:2;
+ content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:8;
+ background:
+  radial-gradient(ellipse at 38% 0%,rgba(255,255,255,.13) 0%,transparent 52%),
+  linear-gradient(180deg,rgba(255,255,255,.065) 0%,transparent 38%);
 }
+/* Bottom rim light */
+.game-card::after{
+ content:'';position:absolute;bottom:0;left:12%;right:12%;height:1px;
+ background:linear-gradient(90deg,transparent,rgba(0,212,255,.22),rgba(123,47,255,.18),transparent);
+ z-index:8;
+}
+/* Premium gold pulse */
+.game-card.premium-card{
+ border:1.5px solid rgba(255,215,0,.58);
+ animation:premium-pulse 2.5s ease-in-out infinite;
+}
+@keyframes premium-pulse{
+ 0%,100%{box-shadow:0 2px 4px rgba(0,0,0,.85),0 8px 24px rgba(0,0,0,.7),0 0 0 1px rgba(255,215,0,.3),0 0 25px rgba(255,215,0,.4),0 0 50px rgba(255,165,0,.18);}
+ 50%{box-shadow:0 2px 4px rgba(0,0,0,.85),0 8px 24px rgba(0,0,0,.7),0 0 0 2px rgba(255,215,0,.5),0 0 40px rgba(255,215,0,.6),0 0 80px rgba(255,165,0,.3);}
+}
+.game-card.premium-card .gc-badge{
+ background:rgba(255,215,0,.2)!important;color:#ffd700!important;
+ border-color:rgba(255,215,0,.4)!important;
+}
+/* Hover: tilt handled by JS, card gets depth glow */
 .game-card:hover{
- transform:translateY(-4px) scale(1.05);
- border-color:rgba(0,212,255,.38);
- box-shadow:0 16px 48px rgba(0,0,0,.65),0 0 28px rgba(0,212,255,.18),0 0 55px rgba(0,212,255,.06),inset 0 1px 0 rgba(255,255,255,.1);
- filter:brightness(1.06);
+ border-color:rgba(0,212,255,.42);
+ box-shadow:
+  0 4px 8px rgba(0,0,0,.9),
+  0 16px 40px rgba(0,0,0,.8),
+  0 0 30px rgba(0,212,255,.2),
+  0 0 60px rgba(0,212,255,.07),
+  inset 0 1px 0 rgba(255,255,255,.12);
 }
 .game-card.active-card:hover{
- border-color:rgba(0,212,255,.55);
- box-shadow:0 18px 55px rgba(0,0,0,.7),0 0 36px rgba(0,212,255,.28),0 0 70px rgba(0,212,255,.1);
+ border-color:rgba(0,212,255,.62);
+ box-shadow:
+  0 4px 8px rgba(0,0,0,.9),
+  0 20px 50px rgba(0,0,0,.85),
+  0 0 40px rgba(0,212,255,.3),
+  0 0 80px rgba(0,212,255,.12);
 }
-/* Taller icon area like BC.Game */
+/* ── ICON AREA: 95% fill, no padding ── */
 .gc-icon{
- width:100%;aspect-ratio:5/4;
+ width:100%;aspect-ratio:1/1;
  display:flex;align-items:center;justify-content:center;
- position:relative;overflow:hidden;
+ position:relative;overflow:hidden;padding:0;
+}
+/* Spotlight radial behind icon */
+.gc-icon::before{
+ content:'';position:absolute;inset:0;
+ background:radial-gradient(ellipse at 42% 35%,rgba(255,255,255,.10) 0%,rgba(0,0,0,.28) 70%);
+ z-index:0;
 }
 .gc-icon-inner{
- font-size:clamp(2.8rem,8vw,4.5rem);
- filter:drop-shadow(0 0 12px currentColor) drop-shadow(0 0 28px currentColor);
- transition:transform .22s cubic-bezier(.34,1.56,.64,1),filter .18s;
- position:relative;z-index:1;
+ width:95%;height:95%;
+ display:flex;align-items:center;justify-content:center;
+ transform:translateZ(20px);
+ transform-style:preserve-3d;
+ transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+ position:relative;z-index:2;
+ filter:drop-shadow(0 6px 14px rgba(0,0,0,.7)) drop-shadow(0 2px 4px rgba(0,0,0,.9));
 }
-.game-card:hover .gc-icon-inner{
- transform:scale(1.14);
- filter:drop-shadow(0 0 16px currentColor) drop-shadow(0 0 40px currentColor);
-}
-/* Multiplier badge like BC.Game */
+.gc-icon-inner svg{width:100%;height:100%;}
+.game-card:hover .gc-icon-inner{transform:translateZ(32px) scale(1.06);}
+/* Multiplier badge */
 .gc-mult-badge{
- position:absolute;top:8px;left:8px;z-index:3;
- font-family:var(--font-d);font-size:.78rem;font-weight:900;
- color:#fff;text-shadow:0 0 10px rgba(255,255,255,.5);
+ position:absolute;top:8px;left:8px;z-index:10;
+ font-family:var(--font-d);font-size:.75rem;font-weight:900;
+ color:#fff;text-shadow:0 0 8px rgba(255,255,255,.5),0 1px 3px rgba(0,0,0,.9);
  letter-spacing:.03em;
 }
-/* Players row at bottom like BC.Game */
-.gc-body{padding:8px 10px 10px;}
+/* Card body */
+.gc-body{padding:6px 10px 9px;position:relative;z-index:5;}
 .gc-name{
- font-family:var(--font-d);font-size:.72rem;font-weight:700;
- color:rgba(255,255,255,.9);text-transform:uppercase;letter-spacing:.06em;
+ font-family:var(--font-d);font-size:.7rem;font-weight:700;
+ color:rgba(255,255,255,.92);text-transform:uppercase;letter-spacing:.06em;
+ text-shadow:0 1px 4px rgba(0,0,0,.8);
 }
 .gc-players{
- display:flex;align-items:center;gap:4px;margin-top:4px;
- font-size:.6rem;color:rgba(255,255,255,.4);
+ display:flex;align-items:center;gap:4px;margin-top:3px;
+ font-size:.58rem;color:rgba(255,255,255,.38);
 }
 .gc-dot{
  width:4px;height:4px;background:var(--green);
  border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0;
+ box-shadow:0 0 4px var(--green);
 }
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
-/* Overlay play button */
+/* Play overlay */
 .gc-play-overlay{
- position:absolute;inset:0;background:rgba(0,0,0,0.45);
+ position:absolute;inset:0;
+ background:linear-gradient(180deg,rgba(0,0,0,.12),rgba(0,0,0,.55));
  display:flex;align-items:center;justify-content:center;
- opacity:0;transition:opacity .2s;z-index:4;backdrop-filter:blur(2px);
+ opacity:0;transition:opacity .22s;z-index:9;
 }
 .game-card:hover .gc-play-overlay{opacity:1;}
 .gc-play-btn{
- background:linear-gradient(135deg,#00d4ff,#7b2fff);
- color:#04060f;font-family:var(--font-d);font-size:.68rem;
- font-weight:800;padding:8px 18px;border-radius:22px;
+ background:linear-gradient(135deg,#00e676,#00d4ff);
+ color:#02080a;font-family:var(--font-d);font-size:.68rem;
+ font-weight:900;padding:9px 20px;border-radius:22px;
  letter-spacing:.06em;text-transform:uppercase;
- box-shadow:0 0 20px rgba(0,212,255,.4);
+ box-shadow:0 0 20px rgba(0,212,255,.5),0 4px 14px rgba(0,0,0,.6);
 }
 /* Badges */
 .gc-badge{
- position:absolute;top:7px;right:7px;z-index:5;
- font-size:.52rem;font-weight:800;padding:3px 7px;
+ position:absolute;top:7px;right:7px;z-index:10;
+ font-size:.5rem;font-weight:800;padding:3px 7px;
  border-radius:20px;text-transform:uppercase;letter-spacing:.05em;
+ text-shadow:0 1px 3px rgba(0,0,0,.6);
 }
-.gc-badge.hot{background:linear-gradient(135deg,#ff6b35,#cc2200);color:white;}
-.gc-badge.new{background:linear-gradient(135deg,var(--purple),var(--purple2));color:white;}
-.gc-badge.exclusive{background:linear-gradient(135deg,var(--neon),var(--neon2));color:#04060f;}
-
-/* ─── STATS BAR ─── */
+.gc-badge.hot{background:linear-gradient(135deg,#ff5533,#cc1100);color:white;box-shadow:0 0 10px rgba(255,60,30,.5);}
+.gc-badge.new{background:linear-gradient(135deg,var(--purple),var(--purple2));color:white;box-shadow:0 0 10px rgba(123,47,255,.4);}
+.gc-badge.exclusive{background:linear-gradient(135deg,var(--neon),var(--neon2));color:#04060f;box-shadow:0 0 10px rgba(0,212,255,.4);}
 .stats-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
 .stat-box{background:rgba(0,212,255,0.04);border:1px solid var(--gb);border-radius:var(--r);padding:14px;text-align:center;}
 .stat-val{font-family:var(--font-m);font-size:1.05rem;font-weight:700;color:var(--neon);}
@@ -1541,7 +1586,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 }
 
 /* ─── GAME CARD ─── */
-.gc-icon{width:100%;aspect-ratio:16/13;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.gc-icon{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:0;}
 @media(max-width:479px){.gc-icon{aspect-ratio:1;}}
 /* Play Now hover overlay */
 .game-card .gc-play-overlay{
@@ -2176,6 +2221,83 @@ input[type=number], input[type=text], input[type=email] {
 .vce-stat-val{font-family:var(--font-d);font-size:.78rem;font-weight:800;color:var(--neon);}
 .vce-stat-lbl{font-size:.44rem;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
 
+/* ════════════════════════════════════════════════════════
+   VORTEX GLOBAL RESPONSIVE — Mobile / Tablet / Desktop
+   ════════════════════════════════════════════════════════ */
+
+/* ── Touch devices: interactive targets ── */
+@media(max-width:767px){
+  .btn,.btn-primary,.btn-green,.btn-red,.btn-outline,
+  .chess-mode-tab,.chess-ai-card,.chess-qbet,.chess-bet-target,
+  .chess-btn-start,.chess-btn-resign,.gc-play-btn,
+  .game-card{touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
+
+  .left-sidebar{display:none!important;}
+  .main-area{margin-left:0!important;}
+  .cbal-amount{font-size:0.85rem!important;}
+  .page{padding:8px 6px!important;}
+
+  /* 2-column grid — strict */
+  .games-grid{
+    grid-template-columns:repeat(2,1fr)!important;
+    gap:7px!important;
+    padding:0!important;
+  }
+  .gc-icon{aspect-ratio:1/1!important;}
+  .gc-icon-inner{width:90%!important;height:90%!important;}
+
+  .hero{padding:16px 14px!important;margin-bottom:12px!important;}
+  .hero-title{font-size:clamp(1.2rem,5vw,1.8rem)!important;}
+  .hero-actions{flex-direction:column!important;}
+
+  .stats-bar{gap:6px!important;}
+  .stat-box{padding:9px 6px!important;}
+  .stat-val{font-size:0.85rem!important;}
+
+  #hotGamesRow .game-card{min-width:112px!important;max-width:130px!important;}
+
+  .modal-box{width:95vw!important;max-height:90vh!important;overflow-y:auto!important;}
+
+  .chess-arena-wrap{flex-direction:column!important;gap:10px!important;}
+  .chess-panel{width:100%!important;}
+  #page-chess{padding:8px 6px!important;}
+}
+
+@media(max-width:379px){
+  .games-grid{gap:5px!important;}
+  .gc-name{font-size:0.6rem!important;}
+  .gc-players{font-size:0.5rem!important;}
+  .gc-badge{font-size:0.44rem!important;padding:2px 5px!important;}
+  .chess-ai-card-desc{display:none!important;}
+}
+
+@media(min-width:600px) and (max-width:899px){
+  .games-grid{grid-template-columns:repeat(3,1fr)!important;gap:9px!important;}
+  .left-sidebar{display:none!important;}
+  .main-area{margin-left:0!important;}
+  .page{padding:12px 14px!important;}
+}
+
+@media(min-width:900px) and (max-width:1279px){
+  .games-grid{grid-template-columns:repeat(4,1fr)!important;}
+  .chess-arena-wrap{flex-direction:row!important;}
+  .chess-panel{width:290px!important;flex-shrink:0!important;}
+}
+
+@media(min-width:1280px){
+  .games-grid{grid-template-columns:repeat(5,1fr)!important;}
+}
+@media(min-width:1600px){
+  .games-grid{grid-template-columns:repeat(6,1fr)!important;gap:12px!important;}
+}
+
+/* Touch devices: lighter 3D (no hover state / coarse pointer) */
+@media(hover:none) and (pointer:coarse){
+  .game-card{will-change:auto;}
+  .gc-icon-inner{transition:transform .18s ease!important;}
+  .game-card:active .gc-icon-inner{transform:scale(1.05)!important;}
+}
+
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -2484,6 +2606,10 @@ input[type=number], input[type=text], input[type=email] {
   <div class="sb-item" id="sb-spinmaster" onclick="goPage('spinmaster')">
    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Spin Master
   </div>
+  <div class="sb-item" id="sb-chess" onclick="goPage('chess')" style="border-left:2px solid rgba(255,215,0,0.4);background:linear-gradient(90deg,rgba(255,215,0,.07),transparent);">
+   <svg viewBox="0 0 24 24" fill="none" stroke="#ffd700" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8l4 4-4 4"/></svg><span style="color:#ffd700;font-family:var(--font-d);font-size:.72rem;font-weight:800;letter-spacing:.04em;">AI vs AI VTX</span>
+   <span class="sb-badge" style="background:rgba(255,215,0,.18);color:#ffd700;border-color:rgba(255,215,0,.35);letter-spacing:.04em;font-weight:900;">NEW</span>
+  </div>
  </div>
 
  <!-- VIP & REWARDS -->
@@ -2555,248 +2681,245 @@ input[type=number], input[type=text], input[type=email] {
  <div class="page active" id="page-home">
  <!-- BC.Game: no separate hero block - slider IS the hero -->
 
- <!-- ══ TOP HERO AUTO-SLIDER: All 8 Games ══ -->
+ <!-- ══ VORTEX FEATURED SLIDER: 3 Newest Games ══ -->
  <div class="mb-20" id="heroSliderWrap">
  <style>
  #heroSliderWrap{position:relative;}
  .hero-slider-track{position:relative;width:100%;overflow:hidden;border-radius:20px;}
  .hero-slide{
- display:none;width:100%;
- background:linear-gradient(135deg,rgba(7,10,24,0.95) 0%,rgba(11,15,36,0.98) 100%);
- border:1px solid rgba(0,212,255,0.15);border-radius:20px;
- padding:20px 22px 18px;cursor:pointer;position:relative;overflow:hidden;
- min-height:130px;align-items:center;gap:18px;
- transition:opacity .4s ease;
+  display:none;width:100%;
+  background:linear-gradient(135deg,rgba(7,10,24,0.97) 0%,rgba(11,15,36,0.99) 100%);
+  border:1px solid rgba(0,212,255,0.15);border-radius:20px;
+  padding:20px 22px 18px;cursor:pointer;position:relative;overflow:hidden;
+  min-height:160px;align-items:center;gap:18px;
+  transition:opacity .45s ease;
  }
+ @media(min-width:768px){.hero-slide{min-height:195px;}}
  .hero-slide.active{display:flex;}
-/* BC.Game promo banner style enhancement */
-.hero-slide{
- min-height:160px;cursor:pointer;
-}
-@media(min-width:768px){.hero-slide{min-height:190px;}}
  .hero-slide::before{
- content:'';position:absolute;inset:0;border-radius:20px;pointer-events:none;
- background:radial-gradient(ellipse at 80% 50%,var(--hs-glow,rgba(0,212,255,0.10)) 0%,transparent 65%);
+  content:'';position:absolute;inset:0;border-radius:20px;pointer-events:none;
+  background:radial-gradient(ellipse at 80% 50%,var(--hs-glow,rgba(0,212,255,0.10)) 0%,transparent 65%);
  }
- .hs-icon{width:82px;height:82px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
+ /* Premium slide: animated gold border */
+ .hero-slide.slide-premium{
+  border:1.5px solid rgba(255,215,0,0.5);
+  animation:slide-gold-pulse 3s ease-in-out infinite;
+ }
+ @keyframes slide-gold-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,215,0,0),0 0 30px rgba(255,165,0,0.15),inset 0 0 20px rgba(255,165,0,0.03);}
+  50%{box-shadow:0 0 0 2px rgba(255,215,0,0.25),0 0 50px rgba(255,165,0,0.28),inset 0 0 30px rgba(255,165,0,0.06);}
+ }
+ .hs-icon{width:90px;height:90px;flex-shrink:0;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
  .hs-content{flex:1;min-width:0;position:relative;z-index:1;}
  .hs-badge{display:inline-block;font-family:var(--font-m);font-size:.55rem;font-weight:700;
- letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:7px;}
- .hs-title{font-family:var(--font-d);font-size:clamp(1.1rem,4vw,1.5rem);font-weight:900;color:white;line-height:1.15;margin-bottom:6px;}
+  letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:7px;}
+ .hs-title{font-family:var(--font-d);font-size:clamp(1.15rem,4vw,1.6rem);font-weight:900;color:white;line-height:1.15;margin-bottom:6px;}
  .hs-sub{font-size:.78rem;color:var(--text2);margin-bottom:12px;line-height:1.4;}
  .hs-play-btn{
- display:inline-flex;align-items:center;gap:6px;
- padding:8px 20px;border-radius:var(--r3);border:none;cursor:pointer;
- font-family:var(--font-d);font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
- transition:all .2s;
+  display:inline-flex;align-items:center;gap:6px;
+  padding:9px 22px;border-radius:var(--r3);border:none;cursor:pointer;
+  font-family:var(--font-d);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  transition:all .2s;
  }
- /* Dot indicators */
- .hs-dots{display:flex;justify-content:center;gap:7px;margin-top:12px;}
- .hs-dot{width:24px;height:3px;border-radius:2px;background:rgba(255,255,255,0.18);cursor:pointer;transition:all .3s;}
- .hs-dot.active{background:var(--neon);width:36px;box-shadow:0 0 6px var(--neon);}
- /* Prev/Next arrows */
+ .hs-play-btn:hover{transform:scale(1.04);}
+ .hs-dots{display:flex;justify-content:center;gap:7px;margin-top:10px;}
+ .hs-dot{width:28px;height:3px;border-radius:2px;background:rgba(255,255,255,0.15);cursor:pointer;transition:all .3s;}
+ .hs-dot.active{background:var(--neon);width:40px;box-shadow:0 0 6px var(--neon);}
+ .hs-dot.gold-dot.active{background:#ffd700;box-shadow:0 0 8px #ffd700;}
  .hs-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;
- width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,0.45);
- border:1px solid rgba(255,255,255,0.15);color:white;font-size:.9rem;
- display:flex;align-items:center;justify-content:center;cursor:pointer;
- transition:all .2s;}
+  width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.15);color:white;font-size:.95rem;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;}
  .hs-arrow:hover{background:rgba(0,212,255,0.25);border-color:var(--neon);}
- .hs-arrow.prev{left:8px;}
- .hs-arrow.next{right:8px;}
- /* Progress bar */
- .hs-progress{height:2px;border-radius:1px;background:rgba(255,255,255,0.08);margin-top:6px;overflow:hidden;}
- .hs-progress-fill{height:100%;border-radius:1px;background:var(--neon);width:0%;transition:width 0.05s linear;}
+ .hs-arrow.prev{left:8px;} .hs-arrow.next{right:8px;}
+ .hs-progress{height:2px;border-radius:1px;background:rgba(255,255,255,0.07);margin-top:6px;overflow:hidden;}
+ .hs-progress-fill{height:100%;border-radius:1px;background:linear-gradient(90deg,#ffd700,#00d4ff);width:0%;transition:width 0.05s linear;}
+ /* FEATURED label strip */
+ .hs-featured-strip{
+  position:absolute;top:10px;left:12px;z-index:5;
+  font-family:var(--font-d);font-size:.5rem;font-weight:900;letter-spacing:.12em;
+  padding:2px 8px;border-radius:20px;text-transform:uppercase;
+ }
  </style>
 
  <div class="sh mb-14">
- <div class="sh-title" style="background:linear-gradient(135deg,#ff2dce,#a020f0,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Featured Games</div>
- <span style="font-size:.65rem;color:var(--text3);font-family:var(--font-m);">AUTO · 8 GAMES</span>
+  <div class="sh-title" style="background:linear-gradient(135deg,#ffd700,#ff9900,#00d4ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Vortex Featured</div>
+  <span style="font-size:.65rem;color:var(--text3);font-family:var(--font-m);">NEWEST · 3 GAMES</span>
  </div>
 
  <div class="hero-slider-track" id="heroSliderTrack">
- <!-- Slide 1: Mines -->
- <div class="hero-slide active" onclick="goPage('mines')" style="--hs-glow:rgba(0,255,136,0.12);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><defs><radialGradient id="hs-mg1" cx="50%" cy="35%" r="60%"><stop offset="0%" stop-color="#00ff88" stop-opacity=".9"/><stop offset="100%" stop-color="#003322" stop-opacity="0"/></radialGradient></defs><circle cx="40" cy="40" r="38" fill="rgba(0,255,136,0.07)" stroke="rgba(0,255,136,0.3)" stroke-width="1"/><polygon points="40,14 46,22 40,30 34,22" fill="#00ff88" style="filter:drop-shadow(0 0 6px #00ff88)"/><polygon points="40,34 46,42 40,50 34,42" fill="#00ffaa" style="filter:drop-shadow(0 0 8px #00ff88)"/><circle cx="40" cy="58" r="7" fill="rgba(255,51,102,0.15)" stroke="#ff3366" stroke-width="1.5"/><line x1="40" y1="51" x2="40" y2="49" stroke="#ff3366" stroke-width="1.5"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#00ff88" opacity=".9">MINES</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(0,255,136,0.12);color:#00ff88;border:1px solid rgba(0,255,136,0.2);">STRATEGY · UP TO 24×</div>
- <div class="hs-title">Vortex Mines</div>
- <div class="hs-sub">Reveal gems, avoid mines. Cash out any time.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#00ff88,#00cc66);color:#030f07;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 2: Crash -->
- <div class="hero-slide" onclick="goPage('crash')" style="--hs-glow:rgba(255,77,106,0.12);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><defs><radialGradient id="hs-cg" cx="50%" cy="60%" r="55%"><stop offset="0%" stop-color="#ff4d6a" stop-opacity=".4"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="40" cy="40" r="38" fill="rgba(255,77,106,0.06)" stroke="rgba(255,77,106,0.25)" stroke-width="1"/><polyline points="10,65 20,55 32,50 45,38 62,18" fill="none" stroke="#ff4d6a" stroke-width="2.5" stroke-linecap="round" style="filter:drop-shadow(0 0 5px #ff4d6a)"/><circle cx="62" cy="18" r="5" fill="#ff4d6a" style="filter:drop-shadow(0 0 8px #ff4d6a)"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ff4d6a" opacity=".9">NEON CRASH</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(255,51,102,0.12);color:#ff4d6a;border:1px solid rgba(255,51,102,0.2);">HOT · MULTIPLAYER</div>
- <div class="hs-title">Neon Crash</div>
- <div class="hs-sub">Ride the multiplier — cash out before it crashes!</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#ff3366,#cc1144);color:white;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 3: Spin Master -->
- <div class="hero-slide" onclick="goPage('spinmaster')" style="--hs-glow:rgba(192,132,252,0.12);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><defs><linearGradient id="hs-sg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#c084fc"/><stop offset="100%" stop-color="#7b2fff"/></linearGradient></defs><circle cx="40" cy="40" r="38" fill="rgba(192,132,252,0.06)" stroke="rgba(192,132,252,0.25)" stroke-width="1"/><line x1="40" y1="40" x2="40" y2="14" stroke="url(#hs-sg)" stroke-width="3" stroke-linecap="round"/><circle cx="40" cy="12" r="4" fill="#c084fc" style="filter:drop-shadow(0 0 6px #c084fc)"/><line x1="40" y1="40" x2="63" y2="53" stroke="url(#hs-sg)" stroke-width="3" stroke-linecap="round"/><circle cx="65" cy="54" r="4" fill="#7b2fff"/><line x1="40" y1="40" x2="17" y2="53" stroke="url(#hs-sg)" stroke-width="3" stroke-linecap="round"/><circle cx="15" cy="54" r="4" fill="#c084fc"/><circle cx="40" cy="40" r="8" fill="rgba(123,47,255,0.4)" stroke="rgba(192,132,252,0.6)" stroke-width="1.5"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#c084fc" opacity=".9">SPIN MASTER</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(192,132,252,0.12);color:#c084fc;border:1px solid rgba(192,132,252,0.2);">NEW · UP TO 10×</div>
- <div class="hs-title">Spin Master</div>
- <div class="hs-sub">Physics-powered wheel with massive multipliers.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#c084fc,#7b2fff);color:white;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 4: Singularity -->
- <div class="hero-slide" onclick="goPage('singularity')" style="--hs-glow:rgba(123,47,255,0.14);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><defs><radialGradient id="hs-bh" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#000"/><stop offset="60%" stop-color="#0a0020"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="40" cy="40" r="38" fill="rgba(123,47,255,0.06)" stroke="rgba(123,47,255,0.25)" stroke-width="1"/><circle cx="40" cy="40" r="14" fill="url(#hs-bh)"/><circle cx="40" cy="40" r="20" fill="none" stroke="rgba(123,47,255,0.4)" stroke-width="1" stroke-dasharray="4 3"/><circle cx="40" cy="40" r="28" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1" stroke-dasharray="6 4"/><circle cx="40" cy="40" r="10" fill="none" stroke="rgba(123,47,255,0.7)" stroke-width="2" style="filter:drop-shadow(0 0 6px #7b2fff)"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="6.5" font-weight="700" fill="#7b2fff" opacity=".9">SINGULARITY</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(123,47,255,0.12);color:#a855f7;border:1px solid rgba(123,47,255,0.2);">BLACK HOLE · 10×</div>
- <div class="hs-title">Singularity</div>
- <div class="hs-sub">Spin the black hole wheel for cosmic multipliers.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#7b2fff,#5500cc);color:white;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 5: Vortex Rush -->
- <div class="hero-slide" onclick="goPage('rush')" style="--hs-glow:rgba(0,212,255,0.12);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="38" fill="rgba(0,212,255,0.06)" stroke="rgba(0,212,255,0.25)" stroke-width="1"/><polygon points="40,12 50,32 72,35 56,50 60,72 40,62 20,72 24,50 8,35 30,32" fill="none" stroke="#00d4ff" stroke-width="2" style="filter:drop-shadow(0 0 6px #00d4ff)"/><polygon points="40,22 46,34 60,36 50,46 52,60 40,54 28,60 30,46 20,36 34,34" fill="rgba(0,212,255,0.15)"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#00d4ff" opacity=".9">VORTEX RUSH</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(0,212,255,0.12);color:#00d4ff;border:1px solid rgba(0,212,255,0.2);">RUSH · INSTANT WIN</div>
- <div class="hs-title">Vortex Rush</div>
- <div class="hs-sub">Lightning-fast rounds with explosive payouts.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#00d4ff,#0099cc);color:#04060f;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 6: Roulette -->
- <div class="hero-slide" onclick="goPage('roulette')" style="--hs-glow:rgba(255,51,102,0.10);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="38" fill="rgba(255,215,0,0.05)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/><circle cx="40" cy="40" r="28" fill="none" stroke="rgba(255,215,0,0.3)" stroke-width="2"/><circle cx="40" cy="40" r="18" fill="none" stroke="rgba(255,51,102,0.4)" stroke-width="1.5"/><circle cx="40" cy="40" r="8" fill="rgba(255,215,0,0.2)" stroke="#ffd700" stroke-width="1.5" style="filter:drop-shadow(0 0 5px #ffd700)"/><line x1="40" y1="12" x2="40" y2="20" stroke="#ff3366" stroke-width="2"/><line x1="40" y1="60" x2="40" y2="68" stroke="#00ff88" stroke-width="2"/><line x1="12" y1="40" x2="20" y2="40" stroke="#ff3366" stroke-width="2"/><line x1="60" y1="40" x2="68" y2="40" stroke="#00ff88" stroke-width="2"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ffd700" opacity=".9">ROULETTE</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(255,215,0,0.10);color:#ffd700;border:1px solid rgba(255,215,0,0.2);">CLASSIC · 36× MAX</div>
- <div class="hs-title">Roulette</div>
- <div class="hs-sub">Red, black, zero — European roulette, provably fair.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#ffd700,#cc9900);color:#04060f;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 7: Dice -->
- <div class="hero-slide" onclick="goPage('dice')" style="--hs-glow:rgba(0,255,136,0.10);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><rect x="16" y="16" width="48" height="48" rx="10" fill="rgba(0,255,136,0.07)" stroke="rgba(0,255,136,0.3)" stroke-width="1.5"/><circle cx="28" cy="28" r="4" fill="#00ff88" style="filter:drop-shadow(0 0 4px #00ff88)"/><circle cx="52" cy="28" r="4" fill="#00ff88" style="filter:drop-shadow(0 0 4px #00ff88)"/><circle cx="40" cy="40" r="4" fill="#00ffaa" style="filter:drop-shadow(0 0 5px #00ff88)"/><circle cx="28" cy="52" r="4" fill="#00ff88"/><circle cx="52" cy="52" r="4" fill="#00ff88"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#00ff88" opacity=".9">DICE</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(0,255,136,0.10);color:#00ff88;border:1px solid rgba(0,255,136,0.2);">PRECISION · 99× MAX</div>
- <div class="hs-title">Dice</div>
- <div class="hs-sub">Set your target, roll the dice, win big.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#00ff88,#00cc66);color:#030f07;">▶ Play Now</button>
- </div>
- </div>
- <!-- Slide 8: VTX Trade -->
- <div class="hero-slide" onclick="goPage('trade')" style="--hs-glow:rgba(255,215,0,0.10);">
- <div class="hs-icon">
- <svg viewBox="0 0 80 80" width="80" height="80"><circle cx="40" cy="40" r="38" fill="rgba(255,215,0,0.05)" stroke="rgba(255,215,0,0.2)" stroke-width="1"/><polyline points="10,60 22,48 32,52 46,34 60,22" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" style="filter:drop-shadow(0 0 4px #00ff88)"/><polyline points="60,22 60,28 66,22" fill="none" stroke="#00ff88" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="35" x2="70" y2="35" stroke="rgba(255,215,0,0.15)" stroke-width="1" stroke-dasharray="3 3"/><text x="40" y="75" text-anchor="middle" font-family="Orbitron" font-size="7" font-weight="700" fill="#ffd700" opacity=".9">VTX TRADE</text></svg>
- </div>
- <div class="hs-content">
- <div class="hs-badge" style="background:rgba(255,215,0,0.10);color:#ffd700;border:1px solid rgba(255,215,0,0.18);">TRADING · 95% RTP</div>
- <div class="hs-title">VTX Trade</div>
- <div class="hs-sub">Predict UP or DOWN on VTX/USDT in 60 seconds.</div>
- <button class="hs-play-btn" style="background:linear-gradient(135deg,#ffd700,#ff9900);color:#04060f;">▶ Play Now</button>
- </div>
- </div>
+
+  <!-- ════ SLIDE 1: AI vs AI VTX — PREMIUM ════ -->
+  <div class="hero-slide slide-premium active" onclick="goPage('chess')" style="--hs-glow:rgba(255,215,0,0.18);background:linear-gradient(135deg,rgba(20,15,0,0.98) 0%,rgba(14,10,0,0.99) 100%);">
+   <div class="hs-featured-strip" style="background:rgba(255,215,0,0.18);color:#ffd700;border:1px solid rgba(255,215,0,0.35);">MASTER GAME</div>
+   <div class="hs-icon">
+    <svg viewBox="0 0 90 90" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <defs>
+      <filter id="slide-chess-glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ffd700" flood-opacity="0.9"/></filter>
+      <radialGradient id="slide-chess-bg" cx="50%" cy="50%" r="50%">
+       <stop offset="0%" stop-color="rgba(255,215,0,0.2)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+     </defs>
+     <circle cx="45" cy="45" r="42" fill="url(#slide-chess-bg)" stroke="rgba(255,215,0,0.5)" stroke-width="1.5"/>
+     <rect x="14" y="14" width="62" height="62" rx="3" fill="none" stroke="rgba(255,215,0,0.4)" stroke-width="1.2" filter="url(#slide-chess-glow)"/>
+     <rect x="14" y="14" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="45" y="14" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="29.5" y="29.5" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="60.5" y="29.5" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="14" y="45" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="45" y="45" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="29.5" y="60.5" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <rect x="60.5" y="60.5" width="15.5" height="15.5" fill="rgba(255,215,0,0.10)"/>
+     <line x1="14" y1="14" x2="76" y2="14" stroke="rgba(255,215,0,0.6)" stroke-width="1.5"/>
+     <line x1="14" y1="29.5" x2="76" y2="29.5" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="14" y1="45" x2="76" y2="45" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="14" y1="60.5" x2="76" y2="60.5" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="14" y1="76" x2="76" y2="76" stroke="rgba(255,215,0,0.6)" stroke-width="1.5"/>
+     <line x1="14" y1="14" x2="14" y2="76" stroke="rgba(255,215,0,0.6)" stroke-width="1.5"/>
+     <line x1="29.5" y1="14" x2="29.5" y2="76" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="45" y1="14" x2="45" y2="76" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="60.5" y1="14" x2="60.5" y2="76" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+     <line x1="76" y1="14" x2="76" y2="76" stroke="rgba(255,215,0,0.6)" stroke-width="1.5"/>
+     <g filter="url(#slide-chess-glow)">
+      <rect x="24" y="56" width="11" height="7" rx="1.5" fill="#ffd700"/>
+      <rect x="25.5" y="50" width="8" height="7" rx="1.5" fill="#ffd700"/>
+      <rect x="27" y="45" width="5" height="6" rx="1.5" fill="#ffd700"/>
+      <circle cx="29.5" cy="42" r="3.5" fill="#ffd700"/>
+      <rect x="55" y="56" width="11" height="7" rx="1.5" fill="#c8d0ff"/>
+      <rect x="56.5" y="50" width="8" height="7" rx="1.5" fill="#c8d0ff"/>
+      <rect x="58" y="45" width="5" height="6" rx="1.5" fill="#c8d0ff"/>
+      <circle cx="60.5" cy="42" r="3.5" fill="#c8d0ff"/>
+     </g>
+    </svg>
+   </div>
+   <div class="hs-content">
+    <div class="hs-badge" style="background:rgba(255,215,0,0.15);color:#ffd700;border:1px solid rgba(255,215,0,0.3);">AI DUEL · LIVE BETTING · NEW</div>
+    <div class="hs-title" style="background:linear-gradient(135deg,#ffd700,#ff9900,#ffec6e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">AI vs AI VTX</div>
+    <div class="hs-sub">Watch Gemini, Claude &amp; Grok battle on a live chess board. Bet on the winner — 2× payout.</div>
+    <button class="hs-play-btn" style="background:linear-gradient(135deg,#ffd700,#cc8800);color:#040200;font-weight:900;">▶ Play Now</button>
+   </div>
+  </div>
+
+  <!-- ════ SLIDE 2: Vortex Circular ════ -->
+  <div class="hero-slide" onclick="goPage('vortex_circular')" style="--hs-glow:rgba(0,212,255,0.15);">
+   <div class="hs-icon">
+    <svg viewBox="0 0 90 90" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <defs>
+      <radialGradient id="vc-slide-bg" cx="50%" cy="50%" r="50%">
+       <stop offset="0%" stop-color="rgba(0,212,255,0.2)"/><stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+      </radialGradient>
+      <filter id="vc-slide-glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#00d4ff" flood-opacity="0.8"/></filter>
+     </defs>
+     <circle cx="45" cy="45" r="42" fill="url(#vc-slide-bg)" stroke="rgba(0,212,255,0.35)" stroke-width="1.5"/>
+     <circle cx="45" cy="45" r="32" fill="none" stroke="rgba(0,212,255,0.2)" stroke-width="1" stroke-dasharray="5 4"/>
+     <circle cx="45" cy="45" r="20" fill="none" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+     <circle cx="45" cy="45" r="10" fill="rgba(0,212,255,0.15)" stroke="#00d4ff" stroke-width="2" filter="url(#vc-slide-glow)"/>
+     <path d="M45 13 A32 32 0 0 1 77 45" stroke="#00d4ff" stroke-width="3" stroke-linecap="round" fill="none" filter="url(#vc-slide-glow)"/>
+     <path d="M45 77 A32 32 0 0 1 13 45" stroke="rgba(0,212,255,0.6)" stroke-width="2" stroke-linecap="round" fill="none"/>
+     <circle cx="77" cy="45" r="4.5" fill="#00d4ff" filter="url(#vc-slide-glow)"/>
+     <circle cx="13" cy="45" r="3" fill="rgba(0,212,255,0.6)"/>
+     <circle cx="45" cy="13" r="3" fill="rgba(0,212,255,0.6)"/>
+     <text x="45" y="82" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="6" font-weight="900" fill="#00d4ff" opacity="0.9" letter-spacing="1">CIRCULAR</text>
+    </svg>
+   </div>
+   <div class="hs-content">
+    <div class="hs-badge" style="background:rgba(0,212,255,0.12);color:#00d4ff;border:1px solid rgba(0,212,255,0.25);">VORTEX ORIGINAL · 50×</div>
+    <div class="hs-title">Vortex Circular</div>
+    <div class="hs-sub">Spin the energy vortex. Every revolution multiplies your bet.</div>
+    <button class="hs-play-btn" style="background:linear-gradient(135deg,#00d4ff,#0088cc);color:#010810;">▶ Play Now</button>
+   </div>
+  </div>
+
+  <!-- ════ SLIDE 3: Neon Crash ════ -->
+  <div class="hero-slide" onclick="goPage('crash')" style="--hs-glow:rgba(255,77,106,0.15);">
+   <div class="hs-icon">
+    <svg viewBox="0 0 90 90" width="90" height="90" fill="none" xmlns="http://www.w3.org/2000/svg">
+     <defs>
+      <filter id="crash-slide-glow"><feDropShadow dx="0" dy="0" stdDeviation="4" flood-color="#ff4d6a" flood-opacity="0.8"/></filter>
+     </defs>
+     <circle cx="45" cy="45" r="42" fill="rgba(255,77,106,0.05)" stroke="rgba(255,77,106,0.3)" stroke-width="1.5"/>
+     <polyline points="12,72 25,58 38,63 54,44 72,20" fill="none" stroke="#ff4d6a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" filter="url(#crash-slide-glow)"/>
+     <circle cx="72" cy="20" r="6" fill="#ff4d6a" filter="url(#crash-slide-glow)"/>
+     <line x1="12" y1="72" x2="78" y2="72" stroke="rgba(255,77,106,0.2)" stroke-width="1" stroke-dasharray="4 4"/>
+     <polyline points="72,20 72,28 80,20" fill="none" stroke="#ff4d6a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+     <text x="45" y="84" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="6" font-weight="900" fill="#ff4d6a" opacity="0.9" letter-spacing="1">NEON CRASH</text>
+    </svg>
+   </div>
+   <div class="hs-content">
+    <div class="hs-badge" style="background:rgba(255,51,102,0.12);color:#ff4d6a;border:1px solid rgba(255,51,102,0.25);">HOT · MULTIPLAYER · 999×</div>
+    <div class="hs-title">Neon Crash</div>
+    <div class="hs-sub">Ride the multiplier — cash out before it crashes!</div>
+    <button class="hs-play-btn" style="background:linear-gradient(135deg,#ff3366,#cc1144);color:white;">▶ Play Now</button>
+   </div>
+  </div>
+
  </div>
 
- <!-- Dots + Progress Bar -->
+ <!-- Dots — 3 slides, first dot is gold for premium -->
  <div class="hs-dots" id="hsDots">
- <div class="hs-dot active" onclick="heroGoSlide(0)"></div>
- <div class="hs-dot" onclick="heroGoSlide(1)"></div>
- <div class="hs-dot" onclick="heroGoSlide(2)"></div>
- <div class="hs-dot" onclick="heroGoSlide(3)"></div>
- <div class="hs-dot" onclick="heroGoSlide(4)"></div>
- <div class="hs-dot" onclick="heroGoSlide(5)"></div>
- <div class="hs-dot" onclick="heroGoSlide(6)"></div>
- <div class="hs-dot" onclick="heroGoSlide(7)"></div>
+  <div class="hs-dot gold-dot active" onclick="heroGoSlide(0)"></div>
+  <div class="hs-dot" onclick="heroGoSlide(1)"></div>
+  <div class="hs-dot" onclick="heroGoSlide(2)"></div>
  </div>
  <div class="hs-progress" id="hsProgress"><div class="hs-progress-fill" id="hsProgressFill"></div></div>
 
  <!-- Prev/Next Arrows -->
- <div class="hs-arrow prev" onclick="heroStep(-1)">‹</div>
- <div class="hs-arrow next" onclick="heroStep(1)">›</div>
+ <div class="hs-arrow prev" onclick="heroStep(-1)">&#8249;</div>
+ <div class="hs-arrow next" onclick="heroStep(1)">&#8250;</div>
  </div>
 
  <script>
  (function(){
- let _hsCurrent = 0;
- const _hsTotal = 8;
- const _hsDuration = 3000; // 3 seconds per slide
- let _hsTimer = null, _hsProgressTimer = null, _hsProgressStart = 0;
+  let _hsCurrent = 0;
+  const _hsTotal  = 3;
+  const _hsDuration = 5000; // 5 seconds — no frantic reset
+  let _hsTimer = null;
 
- function heroGoSlide(idx) {
- const slides = document.querySelectorAll('.hero-slide');
- const dots = document.querySelectorAll('.hs-dot');
- slides[_hsCurrent]?.classList.remove('active');
- dots[_hsCurrent]?.classList.remove('active');
- _hsCurrent = ((idx % _hsTotal) + _hsTotal) % _hsTotal;
- slides[_hsCurrent]?.classList.add('active');
- dots[_hsCurrent]?.classList.add('active');
- resetProgress();
- }
- window.heroGoSlide = heroGoSlide;
+  function heroGoSlide(idx) {
+   const slides = document.querySelectorAll('.hero-slide');
+   const dots   = document.querySelectorAll('.hs-dot');
+   slides[_hsCurrent]?.classList.remove('active');
+   dots[_hsCurrent]?.classList.remove('active');
+   _hsCurrent = ((idx % _hsTotal) + _hsTotal) % _hsTotal;
+   slides[_hsCurrent]?.classList.add('active');
+   dots[_hsCurrent]?.classList.add('active');
+   resetProgress();
+  }
+  window.heroGoSlide = heroGoSlide;
 
- window.heroStep = function(dir) {
- heroGoSlide(_hsCurrent + dir);
- restartAutoPlay();
- };
+  window.heroStep = function(dir) { heroGoSlide(_hsCurrent + dir); restartAutoPlay(); };
 
- function resetProgress() {
- const fill = document.getElementById('hsProgressFill');
- if (!fill) return;
- fill.style.transition = 'none';
- fill.style.width = '0%';
- clearInterval(_hsProgressTimer);
- _hsProgressStart = Date.now();
- setTimeout(() => {
- fill.style.transition = `width ${_hsDuration}ms linear`;
- fill.style.width = '100%';
- }, 20);
- }
+  function resetProgress() {
+   const fill = document.getElementById('hsProgressFill');
+   if (!fill) return;
+   fill.style.transition = 'none';
+   fill.style.width = '0%';
+   setTimeout(() => {
+    fill.style.transition = `width ${_hsDuration}ms linear`;
+    fill.style.width = '100%';
+   }, 20);
+  }
 
- function restartAutoPlay() {
- clearInterval(_hsTimer);
- clearInterval(_hsProgressTimer);
- resetProgress();
- _hsTimer = setInterval(() => heroGoSlide(_hsCurrent + 1), _hsDuration);
- }
+  function restartAutoPlay() {
+   clearInterval(_hsTimer);
+   resetProgress();
+   _hsTimer = setInterval(() => heroGoSlide(_hsCurrent + 1), _hsDuration);
+  }
 
- // Pause on hover
- const track = document.getElementById('heroSliderTrack');
- if (track) {
- track.addEventListener('mouseenter', () => { clearInterval(_hsTimer); });
- track.addEventListener('mouseleave', () => restartAutoPlay());
- // Touch swipe support
- let tsX = 0;
- track.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, {passive:true});
- track.addEventListener('touchend', e => {
- const dx = e.changedTouches[0].clientX - tsX;
- if (Math.abs(dx) > 40) { heroStep(dx < 0 ? 1 : -1); }
- }, {passive:true});
- }
+  const track = document.getElementById('heroSliderTrack');
+  if (track) {
+   track.addEventListener('mouseenter', () => clearInterval(_hsTimer));
+   track.addEventListener('mouseleave', () => restartAutoPlay());
+   let _tsX = 0;
+   track.addEventListener('touchstart', e => { _tsX = e.touches[0].clientX; }, {passive:true});
+   track.addEventListener('touchend',   e => { if(Math.abs(e.changedTouches[0].clientX - _tsX) > 40) heroStep(e.changedTouches[0].clientX < _tsX ? 1 : -1); }, {passive:true});
+  }
 
- // Start auto-play on DOM ready
- if (document.readyState === 'loading') {
- document.addEventListener('DOMContentLoaded', restartAutoPlay);
- } else {
- restartAutoPlay();
- }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', restartAutoPlay);
+  else restartAutoPlay();
  })();
  </script>
- <!-- ══ END TOP HERO AUTO-SLIDER ══ -->
+ <!-- ══ END VORTEX FEATURED SLIDER ══ -->
  <div class="sh mb-12"><div class="sh-title">Live Wins</div></div>
  <div class="live-ticker mb-20" id="liveTicker"></div>
  <div class="stats-bar mb-20">
@@ -4030,7 +4153,7 @@ input[type=number], input[type=text], input[type=email] {
 ════════════════════════════════════════════════════ */
 
 /* ─── STATE ─── */
-let balance = 5000;
+let balance = 5825.90;
 let isLoggedIn = false;
 let currentUser = null;
 let currentPage = 'home';
@@ -4421,7 +4544,7 @@ function goPage(page) {
  const sbEl = document.getElementById('sb-' + page);
  if (sbEl) sbEl.classList.add('active');
  // Bottom nav mapping
- const bnMap = { home: 'home', trade: 'trade', games: 'games', crash: 'games', mines: 'games', tower: 'games', singularity: 'games', rush: 'games', roulette: 'games', dice: 'games', earn: 'earn', tasks: 'earn', wallet: 'wallet', 'profile-page': 'profile', spinmaster: 'games', luckyspin: 'earn' };
+ const bnMap = { home: 'home', trade: 'trade', games: 'games', crash: 'games', mines: 'games', tower: 'games', singularity: 'games', rush: 'games', roulette: 'games', dice: 'games', earn: 'earn', tasks: 'earn', wallet: 'wallet', 'profile-page': 'profile', spinmaster: 'games', luckyspin: 'earn', chess: 'games' };
  const bnKey = bnMap[page] || page;
  const bnEl = document.getElementById('bn-' + bnKey);
  if (bnEl) bnEl.classList.add('active');
@@ -4442,6 +4565,7 @@ function goPage(page) {
  if (page === 'earn') { renderEarnPage(); }
  if (page === 'luckyspin') { renderLuckySpin(); }
  if (page === 'profile-page') { renderProfilePage(); }
+ if (page === 'chess') { if(typeof initChessArena==='function') initChessArena(); }
  // Handle /vortex-admin-777 route
  closeDD();
  window.scrollTo(0, 0);
@@ -4623,58 +4747,81 @@ function neonSvg(path, color, extra='') {
 }
 const NEON_ICONS = {
 
-// ── CRASH — 3D rocket with layered fire plume ──────────────────
+// ── CRASH — Photorealistic steel rocket, solid body + fire trail ─────
 crash: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
- <radialGradient id="cr-body" cx="38%" cy="22%" r="62%">
-  <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/>
-  <stop offset="35%" stop-color="#ff6680" stop-opacity=".95"/>
-  <stop offset="100%" stop-color="#cc1133" stop-opacity=".85"/>
+ <linearGradient id="cr-steel" x1="28%" y1="0%" x2="72%" y2="100%">
+  <stop offset="0%" stop-color="#edf0f8"/><stop offset="20%" stop-color="#c4ccd8"/>
+  <stop offset="45%" stop-color="#929cae"/><stop offset="70%" stop-color="#6e7a8e"/>
+  <stop offset="100%" stop-color="#424d5c"/>
+ </linearGradient>
+ <linearGradient id="cr-shade" x1="0%" y1="0%" x2="100%" y2="0%">
+  <stop offset="0%" stop-color="rgba(0,0,0,.5)"/><stop offset="35%" stop-color="rgba(0,0,0,.08)"/>
+  <stop offset="65%" stop-color="rgba(255,255,255,.07)"/><stop offset="100%" stop-color="rgba(0,0,0,.35)"/>
+ </linearGradient>
+ <radialGradient id="cr-cockpit" cx="38%" cy="28%" r="62%">
+  <stop offset="0%" stop-color="#b8e8ff"/><stop offset="40%" stop-color="#3b7dc8"/>
+  <stop offset="100%" stop-color="#001a40"/>
  </radialGradient>
- <radialGradient id="cr-flame" cx="50%" cy="10%" r="90%">
-  <stop offset="0%" stop-color="#ffffff"/>
-  <stop offset="22%" stop-color="#ffee44"/>
-  <stop offset="50%" stop-color="#ff7700"/>
-  <stop offset="80%" stop-color="#ff2200"/>
-  <stop offset="100%" stop-color="transparent"/>
+ <radialGradient id="cr-fire1" cx="50%" cy="0%" r="100%">
+  <stop offset="0%" stop-color="#ffffff"/><stop offset="14%" stop-color="#fff8cc"/>
+  <stop offset="32%" stop-color="#ffcc00"/><stop offset="58%" stop-color="#ff5500"/>
+  <stop offset="82%" stop-color="#cc1100" stop-opacity=".65"/><stop offset="100%" stop-color="transparent"/>
  </radialGradient>
- <radialGradient id="cr-inner-flame" cx="50%" cy="5%" r="70%">
-  <stop offset="0%" stop-color="#ffffff"/>
-  <stop offset="40%" stop-color="#ffffaa"/>
-  <stop offset="100%" stop-color="transparent"/>
+ <radialGradient id="cr-fire2" cx="50%" cy="0%" r="100%">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity=".9"/><stop offset="28%" stop-color="#ffeeaa"/>
+  <stop offset="62%" stop-color="#ff3300" stop-opacity=".65"/><stop offset="100%" stop-color="transparent"/>
  </radialGradient>
- <filter id="cr-glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
- <filter id="cr-softglow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <radialGradient id="cr-exhaust" cx="50%" cy="25%" r="75%">
+  <stop offset="0%" stop-color="rgba(180,210,255,.4)"/><stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <filter id="cr-glow"><feGaussianBlur stdDeviation="2" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="cr-fire-blur"><feGaussianBlur stdDeviation="2.8" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<g filter="url(#cr-softglow)">
- <!-- Engine fire plume — back layer -->
- <ellipse cx="32" cy="54" rx="10" ry="14" fill="url(#cr-flame)" opacity=".55"/>
- <ellipse cx="29" cy="57" rx="5" ry="8" fill="#ff4400" opacity=".4"/>
- <ellipse cx="35" cy="56" rx="4" ry="7" fill="#ff6600" opacity=".35"/>
- <!-- Engine fire — inner bright -->
- <ellipse cx="32" cy="50" rx="6" ry="9" fill="url(#cr-inner-flame)" opacity=".85"/>
- <ellipse cx="32" cy="47" rx="3" ry="5" fill="#ffffcc" opacity=".9"/>
- <!-- Rocket body — perspective angled -->
- <path d="M32 6 C32 6 42 14 43 30 L38 40 L26 40 L21 30 C22 14 32 6 32 6Z" fill="url(#cr-body)"/>
- <!-- Body shade panel -->
- <path d="M32 6 C32 6 37 12 38.5 26 L36 40 L32 40 L32 6Z" fill="rgba(0,0,0,.18)"/>
- <!-- Glass cockpit -->
- <ellipse cx="32" cy="20" rx="5" ry="6.5" fill="#aaeeff" opacity=".55"/>
- <ellipse cx="30.5" cy="18" rx="2.2" ry="2.8" fill="#ffffff" opacity=".55"/>
- <ellipse cx="32" cy="20" rx="5" ry="6.5" stroke="rgba(255,255,255,.3)" stroke-width="0.8" fill="none"/>
- <!-- Side fins — left -->
- <path d="M21 30 L12 42 L22 38 Z" fill="#cc1133" opacity=".85"/>
- <path d="M21 30 L12 42 L22 38 Z" stroke="rgba(255,100,120,.5)" stroke-width=".8" fill="none"/>
- <!-- Side fins — right -->
- <path d="M43 30 L52 42 L42 38 Z" fill="#cc1133" opacity=".85"/>
- <path d="M43 30 L52 42 L42 38 Z" stroke="rgba(255,100,120,.5)" stroke-width=".8" fill="none"/>
- <!-- Speed trail lines -->
- <line x1="6" y1="48" x2="22" y2="34" stroke="#ff4d6a" stroke-width="1.2" stroke-linecap="round" opacity=".35" stroke-dasharray="3 4"/>
- <line x1="4" y1="42" x2="18" y2="30" stroke="#ff9933" stroke-width=".8" stroke-linecap="round" opacity=".28" stroke-dasharray="2 5"/>
- <line x1="58" y1="48" x2="42" y2="34" stroke="#ff4d6a" stroke-width=".8" stroke-linecap="round" opacity=".22" stroke-dasharray="3 5"/>
- <!-- Highlight stripe -->
- <path d="M29 8 C29 8 27 16 27 26" stroke="rgba(255,255,255,.4)" stroke-width="1.5" stroke-linecap="round"/>
-</g></svg>`,
+<!-- Exhaust haze -->
+<ellipse cx="32" cy="56" rx="11" ry="7" fill="url(#cr-exhaust)" opacity=".55"/>
+<!-- Fire plumes -->
+<g filter="url(#cr-fire-blur)">
+ <path d="M25 46 C22 52 21 60 32 63 C43 60 42 52 39 46Z" fill="url(#cr-fire1)" opacity=".82"/>
+ <path d="M27 45 C26 50 25 57 32 60 C39 57 38 50 37 45Z" fill="url(#cr-fire2)" opacity=".88"/>
+ <path d="M30 45 C30 49 29.5 54 32 57 C34.5 54 34 49 34 45Z" fill="#fffce0" opacity=".94"/>
+ <ellipse cx="32" cy="45" rx="2.2" ry="1.8" fill="white"/>
+</g>
+<!-- Nozzle bell -->
+<path d="M25.5 43 Q28 46 32 46 Q36 46 38.5 43 L37 41 Q34.5 43 32 43 Q29.5 43 27 41Z" fill="#5a6070"/>
+<path d="M27 41 L37 41 L36 42 L28 42Z" fill="#3a4050"/>
+<!-- Rocket main body -->
+<path d="M22 41 L26 15 Q32 6 38 15 L42 41Z" fill="url(#cr-steel)"/>
+<path d="M32 7 Q38 15 38.5 29 L37.5 41 L32 41Z" fill="url(#cr-shade)" opacity=".55"/>
+<!-- Panel rivets / scratches -->
+<line x1="28.5" y1="17" x2="27.5" y2="39" stroke="rgba(255,255,255,.13)" stroke-width=".7"/>
+<line x1="35.5" y1="17" x2="36.5" y2="39" stroke="rgba(0,0,0,.22)" stroke-width=".7"/>
+<line x1="24" y1="29" x2="40" y2="29" stroke="rgba(255,255,255,.07)" stroke-width=".6" stroke-dasharray="1.5 2.5"/>
+<line x1="23" y1="35" x2="41" y2="35" stroke="rgba(255,255,255,.05)" stroke-width=".6" stroke-dasharray="1 3"/>
+<line x1="30.5" y1="9" x2="29.5" y2="16" stroke="rgba(255,255,255,.18)" stroke-width=".6"/>
+<!-- Red accent panels -->
+<path d="M25 27 L27.5 27 L29.5 41 L25.5 41Z" fill="#be1030" opacity=".72"/>
+<path d="M39 27 L36.5 27 L34.5 41 L38.5 41Z" fill="#be1030" opacity=".72"/>
+<!-- Cockpit canopy -->
+<ellipse cx="32" cy="20.5" rx="5.5" ry="6.5" fill="url(#cr-cockpit)" opacity=".92"/>
+<ellipse cx="30" cy="18" rx="2.1" ry="2.7" fill="rgba(255,255,255,.58)" opacity=".85"/>
+<ellipse cx="32" cy="20.5" rx="5.5" ry="6.5" stroke="rgba(255,255,255,.28)" stroke-width=".7" fill="none"/>
+<!-- Left fin -->
+<path d="M22 41 L10 53 L21 45Z" fill="#788098"/>
+<path d="M22 41 L10 53 L21 45Z" fill="url(#cr-shade)" opacity=".4"/>
+<line x1="12" y1="51.5" x2="21.5" y2="43" stroke="rgba(255,255,255,.1)" stroke-width=".6"/>
+<!-- Right fin -->
+<path d="M42 41 L54 53 L43 45Z" fill="#788098"/>
+<path d="M42 41 L54 53 L43 45Z" fill="url(#cr-shade)" opacity=".4"/>
+<!-- Speed trails -->
+<line x1="4" y1="46" x2="14" y2="35" stroke="#ff5522" stroke-width="1.4" stroke-linecap="round" opacity=".38" stroke-dasharray="2 4"/>
+<line x1="2" y1="39" x2="11" y2="30" stroke="#ff9944" stroke-width=".9" stroke-linecap="round" opacity=".26" stroke-dasharray="1 5"/>
+<line x1="60" y1="46" x2="50" y2="35" stroke="#ff5522" stroke-width=".9" stroke-linecap="round" opacity=".25" stroke-dasharray="1 5"/>
+<!-- Nose tip specular -->
+<circle cx="32" cy="8" r="2.2" fill="white" opacity=".65" filter="url(#cr-glow)"/>
+</svg>`,
 
 // ── TOWER — Futuristic neon skyscraper ────────────────────────
 tower: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -4731,46 +4878,57 @@ tower: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http:
  <line x1="44" y1="14" x2="54" y2="20" stroke="#4d1a99" stroke-width="1" opacity=".5"/>
 </g></svg>`,
 
-// ── SINGULARITY — Black hole with accretion disk ──────────────
+// ── SINGULARITY — Violent black hole + glowing accretion disk ────
 singularity: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
- <radialGradient id="sg-hole" cx="50%" cy="50%" r="50%">
-  <stop offset="0%" stop-color="#000000"/>
-  <stop offset="55%" stop-color="#0a0020"/>
-  <stop offset="85%" stop-color="#1a0060" stop-opacity=".7"/>
+ <radialGradient id="sg-void" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="#000"/><stop offset="52%" stop-color="#040010"/>
+  <stop offset="80%" stop-color="#09002a" stop-opacity=".88"/><stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <radialGradient id="sg-hot" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="#ffffff"/><stop offset="10%" stop-color="#fff0cc"/>
+  <stop offset="28%" stop-color="#ffaa00"/><stop offset="52%" stop-color="#cc4400"/>
+  <stop offset="78%" stop-color="#660010" stop-opacity=".45"/><stop offset="100%" stop-color="transparent"/>
+ </radialGradient>
+ <radialGradient id="sg-outer" cx="50%" cy="44%" r="50%">
+  <stop offset="0%" stop-color="rgba(255,150,0,.62)"/><stop offset="38%" stop-color="rgba(180,70,0,.32)"/>
   <stop offset="100%" stop-color="transparent"/>
  </radialGradient>
- <radialGradient id="sg-glow" cx="50%" cy="50%" r="50%">
-  <stop offset="0%" stop-color="transparent"/>
-  <stop offset="50%" stop-color="#7b2fff" stop-opacity=".12"/>
-  <stop offset="75%" stop-color="#a855f7" stop-opacity=".2"/>
-  <stop offset="100%" stop-color="transparent"/>
- </radialGradient>
- <filter id="sg-blur"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="sg-hard"><feGaussianBlur stdDeviation="2" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="sg-soft"><feGaussianBlur stdDeviation="3.8" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<g filter="url(#sg-blur)">
- <!-- Outer glow halo -->
- <circle cx="32" cy="32" r="28" fill="url(#sg-glow)"/>
- <!-- Accretion disk rings — elliptical perspective -->
- <ellipse cx="32" cy="32" rx="27" ry="9" stroke="#a855f7" stroke-width="1.8" fill="none" opacity=".55"/>
- <ellipse cx="32" cy="32" rx="22" ry="7" stroke="#7b2fff" stroke-width="2.2" fill="none" opacity=".7"/>
- <ellipse cx="32" cy="32" rx="16" ry="5.5" stroke="#9044ee" stroke-width="2.5" fill="none" opacity=".8"/>
- <ellipse cx="32" cy="32" rx="10" ry="3.5" stroke="#bb66ff" stroke-width="2" fill="none" opacity=".85"/>
- <!-- Hot accretion spots -->
- <path d="M32 24 A8 2.5 0 0 1 44 28" stroke="#ff2dce" stroke-width="3" fill="none" stroke-linecap="round" opacity=".75"/>
- <path d="M32 40 A8 2.5 0 0 1 20 36" stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".6"/>
- <!-- Spiral arm — top right -->
- <path d="M38 14 C44 18 46 24 42 28" stroke="#c084fc" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".55"/>
- <!-- Spiral arm — bottom left -->
- <path d="M26 50 C20 46 18 40 22 36" stroke="#a855f7" stroke-width="1.5" fill="none" stroke-linecap="round" opacity=".45"/>
- <!-- Black hole core -->
- <circle cx="32" cy="32" r="9" fill="url(#sg-hole)"/>
- <circle cx="32" cy="32" r="5.5" fill="#000"/>
- <!-- Photon sphere glow ring -->
- <circle cx="32" cy="32" r="9" stroke="#7b2fff" stroke-width="1.2" fill="none" opacity=".7"/>
- <!-- Gravitational lensing flash -->
- <path d="M42 22 L38 27" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/>
-</g></svg>`,
+<circle cx="32" cy="32" r="30" fill="rgba(4,0,16,.96)"/>
+<circle cx="8" cy="9" r=".65" fill="white" opacity=".55"/>
+<circle cx="54" cy="7" r=".5" fill="white" opacity=".45"/>
+<circle cx="59" cy="22" r=".6" fill="#aaddff" opacity=".65"/>
+<circle cx="5" cy="47" r=".5" fill="white" opacity=".5"/>
+<circle cx="57" cy="51" r=".65" fill="#ffcc88" opacity=".58"/>
+<circle cx="13" cy="56" r=".5" fill="white" opacity=".42"/>
+<g filter="url(#sg-soft)">
+ <ellipse cx="32" cy="32" rx="27" ry="9.5" fill="url(#sg-outer)" opacity=".65"/>
+ <ellipse cx="32" cy="32" rx="21" ry="7" fill="url(#sg-hot)" opacity=".78"/>
+</g>
+<g filter="url(#sg-hard)">
+ <line x1="32" y1="32" x2="32" y2="4" stroke="#44aaff" stroke-width="2" stroke-linecap="round" opacity=".82"/>
+ <line x1="32" y1="32" x2="32" y2="60" stroke="#44aaff" stroke-width="2" stroke-linecap="round" opacity=".82"/>
+ <ellipse cx="32" cy="4" rx="2.8" ry="4.5" fill="#aaddff" opacity=".62"/>
+ <ellipse cx="32" cy="60" rx="2.8" ry="4.5" fill="#aaddff" opacity=".62"/>
+</g>
+<g filter="url(#sg-hard)">
+ <path d="M8 32 Q20 21 32 21 Q44 21 56 32" stroke="#ffcc44" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".95"/>
+ <path d="M10 33 Q22 23 32 23 Q42 23 54 33" stroke="rgba(255,255,255,.55)" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+ <circle cx="14" cy="29" r="2.1" fill="#ffeeaa" opacity=".92"/>
+ <circle cx="50" cy="29" r="2.1" fill="#ffeeaa" opacity=".92"/>
+ <circle cx="32" cy="21" r="1.7" fill="white" opacity=".82"/>
+</g>
+<circle cx="32" cy="32" r="12" fill="url(#sg-void)"/>
+<circle cx="32" cy="32" r="9.5" fill="black"/>
+<circle cx="32" cy="32" r="12.5" fill="none" stroke="#ff9900" stroke-width="1.8" opacity=".72" filter="url(#sg-hard)"/>
+<path d="M20 21 Q13 29 20 39" stroke="rgba(140,200,255,.38)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+<path d="M44 21 Q51 29 44 39" stroke="rgba(140,200,255,.38)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+</svg>`,
 
 // ── VORTEX RUSH — Lightning energy bolt ───────────────────────
 rush: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -5043,53 +5201,107 @@ plinko: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http
 // ── VORTEX CIRCULAR — 3D glowing crystalline orb with rings ───
 vortex_circular: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
 <defs>
- <radialGradient id="vc-orb" cx="38%" cy="32%" r="62%">
-  <stop offset="0%" stop-color="#ffffff" stop-opacity=".95"/>
-  <stop offset="28%" stop-color="#88ddff" stop-opacity=".9"/>
-  <stop offset="55%" stop-color="#0088cc" stop-opacity=".85"/>
-  <stop offset="80%" stop-color="#4400bb" stop-opacity=".8"/>
-  <stop offset="100%" stop-color="#220060" stop-opacity=".7"/>
- </radialGradient>
- <radialGradient id="vc-halo" cx="50%" cy="50%" r="50%">
-  <stop offset="40%" stop-color="transparent"/>
-  <stop offset="75%" stop-color="#00d4ff" stop-opacity=".12"/>
+ <radialGradient id="vc-core" cx="50%" cy="50%" r="50%">
+  <stop offset="0%" stop-color="#ffffff"/><stop offset="22%" stop-color="#aaeeff"/>
+  <stop offset="50%" stop-color="#0088ff"/><stop offset="82%" stop-color="#002266" stop-opacity=".7"/>
   <stop offset="100%" stop-color="transparent"/>
  </radialGradient>
- <filter id="vc-glow"><feGaussianBlur stdDeviation="2.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <linearGradient id="vc-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+  <stop offset="0%" stop-color="rgba(255,255,255,.5)"/><stop offset="50%" stop-color="rgba(0,212,255,.2)"/>
+  <stop offset="100%" stop-color="rgba(123,47,255,.15)"/>
+ </linearGradient>
+ <filter id="vc-glow"><feGaussianBlur stdDeviation="2.4" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+ <filter id="vc-spark"><feGaussianBlur stdDeviation="1.4" result="b"/>
+  <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs>
-<g filter="url(vc-glow)">
- <!-- Outer halo -->
- <circle cx="32" cy="32" r="30" fill="url(#vc-halo)"/>
- <!-- Ring 1 — outer ellipse (3D perspective) -->
- <ellipse cx="32" cy="32" rx="29" ry="10" stroke="#00d4ff" stroke-width="1.8" fill="none" opacity=".5" stroke-dasharray="6 3"/>
- <!-- Ring 2 — middle tilted -->
- <ellipse cx="32" cy="32" rx="22" ry="22" stroke="#7b2fff" stroke-width="1.5" fill="none" opacity=".5" transform="rotate(55 32 32)" stroke-dasharray="4 4"/>
- <!-- Ring 3 — inner tight -->
- <ellipse cx="32" cy="32" rx="13" ry="5" stroke="#00ff88" stroke-width="1.5" fill="none" opacity=".55" transform="rotate(-20 32 32)"/>
- <!-- Orb glow backing -->
- <circle cx="32" cy="32" r="14" fill="rgba(0,212,255,.15)"/>
- <!-- Orb body — 3D sphere -->
- <circle cx="32" cy="32" r="12" fill="url(#vc-orb)"/>
- <!-- Crystal facet reflections -->
- <path d="M26 26 L32 20 L38 26 L32 30 Z" fill="rgba(255,255,255,.18)"/>
- <path d="M26 38 L32 44 L38 38 L32 34 Z" fill="rgba(0,212,255,.12)"/>
- <!-- Specular highlight -->
- <ellipse cx="28.5" cy="27" rx="4" ry="2.8" fill="rgba(255,255,255,.55)" transform="rotate(-35 28.5 27)"/>
- <circle cx="27.5" cy="26" r="2" fill="rgba(255,255,255,.8)"/>
- <!-- Orb rim glow -->
- <circle cx="32" cy="32" r="12" stroke="#00d4ff" stroke-width="1.5" fill="none" opacity=".6"/>
- <!-- Energy sparks around orb -->
- <line x1="32" y1="16" x2="32" y2="19" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".7"/>
- <line x1="46" y1="22" x2="44" y2="24.5" stroke="#7b2fff" stroke-width="1.2" stroke-linecap="round" opacity=".65"/>
- <line x1="48" y1="32" x2="45" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
- <line x1="46" y1="42" x2="44" y2="39.5" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
- <line x1="32" y1="48" x2="32" y2="45" stroke="#00d4ff" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
- <line x1="18" y1="42" x2="20" y2="39.5" stroke="#7b2fff" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
- <line x1="16" y1="32" x2="19" y2="32" stroke="#00d4ff" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>
- <line x1="18" y1="22" x2="20" y2="24.5" stroke="#00ff88" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
-</g></svg>`,
+<!-- Deep space -->
+<circle cx="32" cy="32" r="30" fill="rgba(4,6,20,.96)"/>
+<circle cx="10" cy="8" r=".6" fill="white" opacity=".5"/>
+<circle cx="54" cy="6" r=".5" fill="white" opacity=".4"/>
+<circle cx="58" cy="28" r=".65" fill="#aaddff" opacity=".6"/>
+<circle cx="6" cy="42" r=".5" fill="white" opacity=".5"/>
+<circle cx="56" cy="54" r=".6" fill="#ccaaff" opacity=".55"/>
+<!-- Outer ring — green crystalline (tilted ellipse for 3D) -->
+<g filter="url(#vc-glow)">
+ <ellipse cx="32" cy="32" rx="27" ry="9.5" fill="none" stroke="rgba(0,255,136,.48)" stroke-width="4.5" transform="rotate(-22 32 32)"/>
+ <ellipse cx="32" cy="32" rx="27" ry="9.5" fill="none" stroke="rgba(120,255,190,.75)" stroke-width="1.4" transform="rotate(-22 32 32)"/>
+</g>
+<!-- Middle ring — blue crystalline -->
+<g filter="url(#vc-glow)">
+ <ellipse cx="32" cy="32" rx="20" ry="7.5" fill="none" stroke="rgba(0,212,255,.55)" stroke-width="3.5" transform="rotate(18 32 32)"/>
+ <ellipse cx="32" cy="32" rx="20" ry="7.5" fill="none" stroke="rgba(160,240,255,.82)" stroke-width="1.1" transform="rotate(18 32 32)"/>
+</g>
+<!-- Inner ring — purple crystalline -->
+<g filter="url(#vc-glow)">
+ <ellipse cx="32" cy="32" rx="13.5" ry="5.5" fill="none" stroke="rgba(180,100,255,.65)" stroke-width="3" transform="rotate(48 32 32)"/>
+ <ellipse cx="32" cy="32" rx="13.5" ry="5.5" fill="none" stroke="rgba(220,180,255,.88)" stroke-width="1" transform="rotate(48 32 32)"/>
+</g>
+<!-- Crystal facet panels on rings -->
+<path d="M13 27 L20 23 L20 27Z" fill="url(#vc-crystal)" opacity=".65"/>
+<path d="M51 37 L44 41 L44 37Z" fill="url(#vc-crystal)" opacity=".55"/>
+<path d="M22 17 L28 13 L26 18Z" fill="rgba(100,255,180,.32)" opacity=".72"/>
+<path d="M42 45 L36 49 L38 44Z" fill="rgba(100,255,180,.32)" opacity=".62"/>
+<!-- Energy sparks -->
+<g filter="url(#vc-spark)">
+ <circle cx="21" cy="21" r="1.6" fill="#00ffcc" opacity=".92"/>
+ <circle cx="44" cy="17" r="1.3" fill="#aaddff" opacity=".88"/>
+ <circle cx="48" cy="45" r="1.6" fill="#cc88ff" opacity=".92"/>
+ <circle cx="15" cy="45" r="1.3" fill="#00ff88" opacity=".88"/>
+ <circle cx="38" cy="11" r="1.1" fill="white" opacity=".8"/>
+ <circle cx="26" cy="51" r="1.1" fill="white" opacity=".8"/>
+ <line x1="21" y1="21" x2="25" y2="17" stroke="#00ffcc" stroke-width=".8" stroke-linecap="round" opacity=".62"/>
+ <line x1="44" y1="17" x2="40" y2="21" stroke="#aaddff" stroke-width=".8" stroke-linecap="round" opacity=".62"/>
+ <line x1="48" y1="45" x2="44" y2="41" stroke="#cc88ff" stroke-width=".8" stroke-linecap="round" opacity=".62"/>
+</g>
+<!-- Core energy orb -->
+<g filter="url(#vc-glow)">
+ <circle cx="32" cy="32" r="7" fill="url(#vc-core)"/>
+ <circle cx="32" cy="32" r="4" fill="rgba(255,255,255,.58)"/>
+ <circle cx="30" cy="30" r="1.8" fill="white" opacity=".72"/>
+</g>
+</svg>`,
+  chess: `<svg viewBox="0 0 64 64" width="60" height="60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="chess-glow"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#ffd700" flood-opacity="0.8"/></filter>
+    <radialGradient id="chess-bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,215,0,0.15)"/>
+      <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#chess-bg)" stroke="rgba(255,215,0,0.4)" stroke-width="1"/>
+  <rect x="10" y="10" width="44" height="44" rx="3" fill="none" stroke="rgba(255,215,0,0.3)" stroke-width="1" filter="url(#chess-glow)"/>
+  <rect x="10" y="10" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="32" y="10" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="21" y="21" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="43" y="21" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="10" y="32" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="32" y="32" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="21" y="43" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <rect x="43" y="43" width="11" height="11" fill="rgba(255,215,0,0.12)"/>
+  <line x1="10" y1="10" x2="54" y2="10" stroke="rgba(255,215,0,0.5)" stroke-width="1.2"/>
+  <line x1="10" y1="21" x2="54" y2="21" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="10" y1="32" x2="54" y2="32" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="10" y1="43" x2="54" y2="43" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="10" y1="54" x2="54" y2="54" stroke="rgba(255,215,0,0.5)" stroke-width="1.2"/>
+  <line x1="10" y1="10" x2="10" y2="54" stroke="rgba(255,215,0,0.5)" stroke-width="1.2"/>
+  <line x1="21" y1="10" x2="21" y2="54" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="32" y1="10" x2="32" y2="54" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="43" y1="10" x2="43" y2="54" stroke="rgba(255,215,0,0.3)" stroke-width="0.8"/>
+  <line x1="54" y1="10" x2="54" y2="54" stroke="rgba(255,215,0,0.5)" stroke-width="1.2"/>
+  <g filter="url(#chess-glow)">
+    <rect x="18" y="40" width="8" height="5" rx="1" fill="#ffd700"/>
+    <rect x="19" y="36" width="6" height="5" rx="1" fill="#ffd700"/>
+    <rect x="20" y="33" width="4" height="4" rx="1" fill="#ffd700"/>
+    <circle cx="22" cy="31" r="2.5" fill="#ffd700"/>
+    <rect x="38" y="40" width="8" height="5" rx="1" fill="#e8e8ff"/>
+    <rect x="39" y="36" width="6" height="5" rx="1" fill="#e8e8ff"/>
+    <rect x="40" y="33" width="4" height="4" rx="1" fill="#e8e8ff"/>
+    <circle cx="42" cy="31" r="2.5" fill="#e8e8ff"/>
+  </g>
+  <text x="32" y="62" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="5.5" font-weight="900" fill="#ffd700" opacity="0.9" letter-spacing="1">AI VTX</text>
+</svg>`,
 };
-/* Category icons for the 89 placeholder games */};
 /* Category icons for the 89 placeholder games */
 const CAT_ICONS = [
  neonSvg('<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>','#00d4ff'), // cards
@@ -5105,6 +5317,7 @@ const CAT_ICONS = [
 ];
 
 const GAMES_DATA = [
+ { id: 'chess', name: 'AI vs AI VTX', players: 1284, badge: 'hot', bgColor: '#0a0800', premium: true },
  { id: 'crash', name: 'Crash', players: 847, badge: 'hot', bgColor: '#0d0508' },
  { id: 'mines', name: 'Mines', players: 732, badge: 'hot', bgColor: '#020d06' },
  { id: 'tower', name: 'Tower', players: 512, badge: 'new', bgColor: '#08041a' },
@@ -5118,7 +5331,7 @@ const GAMES_DATA = [
  { id: 'vortex_circular', name: 'Vortex Circular', players: 612, badge: 'new', bgColor: '#021018' },
  { id: 'plinko', name: 'Plinko', players: 534, badge: '', bgColor: '#02080f' },
 ];
-const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice','limbo','wheel','plinko','vortex_circular']);
+const ACTIVE_GAMES_SET = new Set(['crash','mines','tower','singularity','rush','roulette','dice','limbo','wheel','plinko','vortex_circular','chess']);
 const ALL_100_GAMES = (function(){
  const extras = ['Blackjack','Baccarat','Keno','Slots Pro','Dragon Tiger','Andar Bahar','Teen Patti','3 Card Poker','Sic Bo','Pai Gow','Fast Keno','Lightning Dice','Super Sic Bo','Dragon Drop','Money Wheel','Golden Bat','Speed Baccarat','Quantum Roulette','Monopoly Live','Deal or No Deal','Football Studio','Gonzo Quest','Book of Dead','Starburst','Reactoonz','Gates of Olympus','Sweet Bonanza','Big Bass Bonanza','Money Train','Dead or Alive','Razor Shark','Wolf Gold','Rise of Merlin','Jammin Jars','Fruit Party','Invaders Moon','Release the Kraken','Buffalo King','Primate King','Wild West Gold','Piggy Riches','Reel King','Eye of Horus','Fishin Frenzy','Rainbow Riches','Mega Moolah','Divine Fortune','Hall of Gods','Age of Gods','Jackpot Giant','Gladiator','Lara Croft','Sherlock','Batman','Jurassic Park','Terminator','Iron Man','Thor','Hulk','Captain America','Spider Man','X Men','Fantastic Four','Blade','Daredevil','Punisher','Ghost Rider','Elektra','Wolverine','Cyclops','Storm','Jean Grey','Rogue','Gambit','Avalon','Thunderstruck','Immortal Romance','Hitman','Tomb Raider','Playboy','Lucky Leprechaun','Tiki Bounce','Amazon Wild','Snow Leopard','Dolphin Coast','Mega Gems','Diamond Empire','Royal Charm'];
  const base = [...GAMES_DATA];
@@ -5220,35 +5433,37 @@ const CARD_GRADIENTS = {
  limbo:          'linear-gradient(145deg,#161004 0%,#2a1e08 55%,#100c02 100%)',
  wheel:          'linear-gradient(145deg,#041408 0%,#082814 55%,#020c04 100%)',
  plinko:         'linear-gradient(145deg,#021014 0%,#041e28 55%,#010a10 100%)',
+ chess:           'linear-gradient(145deg,#0d0a00 0%,#1a1400 55%,#080600 100%)',
  vortex_circular:'linear-gradient(145deg,#040c18 0%,#08183a 55%,#020810 100%)',
  spinmaster:     'linear-gradient(145deg,#1a0020 0%,#320040 55%,#12001a 100%)',
  default:        'linear-gradient(145deg,#0a0e1e 0%,#06081a 100%)',
 };
 const CARD_MULT = {
  crash:'999×', dice:'48×', roulette:'36×', singularity:'500×', rush:'200×',
- limbo:'∞×', tower:'100×', wheel:'50×', plinko:'1000×', vortex_circular:'50×'
+ chess:'AI×', limbo:'∞×', tower:'100×', wheel:'50×', plinko:'1000×', vortex_circular:'50×'
 };
 
 function gameCard(g) {
  const active = ACTIVE_GAMES_SET.has(g.id);
  const icon = NEON_ICONS[g.id] || CAT_ICONS[Math.abs(g.name.charCodeAt(0) + g.name.charCodeAt(1)) % CAT_ICONS.length];
  const clickFn = active ? `goPage('${g.id}')` : `showDevPopup('${g.name}')`;
- const soonBadge = g.dev ? `<span style="position:absolute;top:6px;right:6px;background:rgba(255,215,0,.12);color:#ffd700;font-size:.5rem;font-weight:700;padding:2px 5px;border-radius:8px;border:1px solid rgba(255,215,0,.2);z-index:5;">SOON</span>` : '';
+ const soonBadge = g.dev ? `<span style="position:absolute;top:6px;right:6px;background:rgba(255,215,0,.12);color:#ffd700;font-size:.5rem;font-weight:700;padding:2px 5px;border-radius:8px;border:1px solid rgba(255,215,0,.2);z-index:10;">SOON</span>` : '';
  const mainBadge = g.badge ? `<span class="gc-badge ${g.badge}">${g.badge}</span>` : '';
  const vbotSvg = `<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="#00d4ff" stroke-width="2"><rect x="7" y="11" width="10" height="9" rx="2"/><path d="M12 11V8"/><circle cx="12" cy="6" r="2"/><circle cx="9.5" cy="14.5" r="1" fill="#00d4ff"/><circle cx="14.5" cy="14.5" r="1" fill="#00d4ff"/></svg>`;
  const liveCount = (400 + Math.floor(Math.random() * 500)).toLocaleString();
  const bg = CARD_GRADIENTS[g.id] || CARD_GRADIENTS.default;
  const multBadge = CARD_MULT[g.id] ? `<div class="gc-mult-badge">${CARD_MULT[g.id]}</div>` : '';
- return `<div class="game-card" onclick="${clickFn}" style="background:${bg};${g.dev?'opacity:.75;':''}">
+ const premiumBorder = g.premium ? 'border:1.5px solid rgba(255,215,0,0.6);' : '';
+ return `<div class="game-card${g.premium?' premium-card':''}" onclick="${clickFn}" style="background:${bg};${premiumBorder}${g.dev?'opacity:.72;':''}">
  ${mainBadge}${soonBadge}${multBadge}
- <div class="gc-play-overlay"><div class="gc-play-btn">${active?'Play Now':'Coming Soon'}</div></div>
- <div class="gc-icon" style="padding:14px 10px;"><div class="gc-icon-inner">${icon}</div></div>
+ <div class="gc-play-overlay"><div class="gc-play-btn">${active?'&#9654; Play Now':'Coming Soon'}</div></div>
+ <div class="gc-icon"><div class="gc-icon-inner">${icon}</div></div>
  <div class="gc-body">
   <div class="gc-name">${g.name}</div>
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px;">
    <div class="gc-players"><span class="gc-dot"></span>${liveCount} online</div>
-   <div onclick="event.stopPropagation();openVBot('${g.name.replace(/'/g,"\\'")}','${g.id}')" style="display:flex;align-items:center;gap:2px;cursor:pointer;padding:3px 6px;border-radius:7px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.15);" title="AI Strategy">
-    ${vbotSvg}<span style="font-size:.5rem;color:var(--neon);font-weight:700;">BOT</span>
+   <div onclick="event.stopPropagation();openVBot('${g.name.replace(/'/g,"\'")}','${g.id}')" style="display:flex;align-items:center;gap:2px;cursor:pointer;padding:2px 5px;border-radius:6px;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.12);" title="AI Strategy">
+    ${vbotSvg}<span style="font-size:.48rem;color:var(--neon);font-weight:700;">BOT</span>
    </div>
   </div>
  </div>
@@ -8588,6 +8803,636 @@ document.addEventListener('keydown', e => {
 </div>
 
 
+<!-- ══════════════════════════════════════════════════════════════════
+     VORTEX AI vs AI VTX — MASTER GAME · PREMIUM
+     ══════════════════════════════════════════════════════════════════ -->
+<style>
+/* ─── CHESS ARENA STYLES ─── */
+/* ═════════════════════════════════════════════════════════
+   AI vs AI VTX — RESPONSIVE CHESS ARENA
+   Mobile-first · Touch-optimised · 144Hz smooth
+   ═════════════════════════════════════════════════════════ */
+
+/* ── Page wrapper ── */
+#page-chess {
+  padding: 10px 8px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media(min-width:600px){ #page-chess { padding: 16px; } }
+@media(min-width:900px){ #page-chess { padding: 20px 24px; } }
+
+/* ── 2-column layout on desktop, stacked on mobile ── */
+.chess-arena-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media(min-width:900px){
+  .chess-arena-wrap {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+/* ── BOARD CONTAINER ── */
+.chess-board-container {
+  background: linear-gradient(145deg, rgba(0,212,255,0.04), rgba(123,47,255,0.03));
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 40px rgba(0,212,255,0.08), 0 0 80px rgba(123,47,255,0.05);
+  flex-shrink: 0;
+}
+@media(min-width:900px){ .chess-board-container { padding: 16px; } }
+
+/* ── PLAYER BAR ── */
+.chess-player-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.03);
+  box-sizing: border-box;
+  min-width: 0;
+}
+.chess-player-bar.active-player {
+  border-color: rgba(0,212,255,0.35);
+  background: rgba(0,212,255,0.06);
+  box-shadow: 0 0 12px rgba(0,212,255,0.15);
+}
+.chess-player-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.65rem; font-weight: 800;
+  font-family: var(--font-d); flex-shrink: 0;
+  letter-spacing: -0.02em;
+}
+.chess-player-name { font-family: var(--font-d); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chess-player-persona { font-size: 0.6rem; color: var(--text2); letter-spacing: 0.06em; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chess-timer {
+  margin-left: auto;
+  font-family: var(--font-m); font-size: 1rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 8px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 52px; text-align: center; flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+.chess-timer.low { color: #ff4444 !important; animation: timer-flash 0.5s ease-in-out infinite; border-color: rgba(255,68,68,0.4); }
+@keyframes timer-flash { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
+/* ── IDLE OVERLAY on board ── */
+.chess-idle-overlay {
+  display: flex;
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  border-radius: 4px;
+  z-index: 50;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: opacity 0.3s;
+}
+.chess-idle-overlay.hidden { display: none; }
+.chess-idle-title {
+  font-family: var(--font-d);
+  font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+  font-weight: 900;
+  color: #ffd700;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(255,215,0,0.6);
+}
+.chess-idle-sub {
+  font-size: 0.7rem;
+  color: var(--text2);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── THE BOARD ── */
+.chess-board-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 2px solid rgba(0,212,255,0.3);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0,212,255,0.1),
+    0 0 30px rgba(0,212,255,0.12),
+    0 0 60px rgba(123,47,255,0.08),
+    inset 0 0 20px rgba(0,0,0,0.4);
+  /* Fluid board: fills container width, never overflows */
+  width: 100%;
+  max-width: min(480px, calc(100vw - 32px));
+  aspect-ratio: 1 / 1;
+  box-sizing: border-box;
+  touch-action: none; /* Prevent scroll during chess moves on mobile */
+}
+@media(min-width:600px){
+  .chess-board { max-width: min(480px, calc(100vw - 60px)); }
+}
+@media(min-width:900px){
+  .chess-board { max-width: 460px; }
+}
+
+.chess-sq {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.12s;
+  aspect-ratio: 1;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.chess-sq.light { background: rgba(0,212,255,0.07); }
+.chess-sq.dark  { background: rgba(5,8,20,0.7); }
+.chess-sq:hover { filter: brightness(1.3); }
+.chess-sq.selected {
+  background: rgba(0,230,118,0.25) !important;
+  box-shadow: inset 0 0 0 2px rgba(0,230,118,0.6);
+}
+.chess-sq.valid-move::after {
+  content: ''; position: absolute;
+  width: 32%; height: 32%; border-radius: 50%;
+  background: rgba(0,230,118,0.45);
+  box-shadow: 0 0 8px rgba(0,230,118,0.5);
+  pointer-events: none;
+}
+.chess-sq.valid-capture::after {
+  content: ''; position: absolute; inset: 4%;
+  border-radius: 50%;
+  border: 3px solid rgba(255,68,68,0.7);
+  box-shadow: 0 0 8px rgba(255,68,68,0.4);
+  pointer-events: none;
+}
+.chess-sq.in-check {
+  background: rgba(255,50,50,0.35) !important;
+  box-shadow: inset 0 0 0 2px rgba(255,50,50,0.8), 0 0 12px rgba(255,50,50,0.4);
+}
+.chess-sq.last-move { background: rgba(0,212,255,0.12) !important; }
+
+.chess-piece {
+  width: 82%; height: 82%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative; z-index: 2;
+  transition: transform 0.12s;
+  pointer-events: none; user-select: none;
+  -webkit-user-select: none;
+}
+.chess-sq:hover .chess-piece { transform: scale(1.08); }
+.chess-sq.selected .chess-piece { transform: scale(1.12); }
+
+/* Coordinate labels */
+.chess-file-labels, .chess-rank-labels {
+  display: flex;
+  width: 100%;
+  max-width: min(480px, calc(100vw - 32px));
+  box-sizing: border-box;
+}
+@media(min-width:900px){
+  .chess-file-labels, .chess-rank-labels { max-width: 460px; }
+}
+.chess-file-labels { flex-direction: row; }
+.chess-rank-labels { flex-direction: column; position: absolute; left: -16px; top: 0; height: 100%; }
+.chess-coord {
+  flex: 1; text-align: center;
+  font-size: 0.55rem; color: var(--text3);
+  font-family: var(--font-m); letter-spacing: 0.05em;
+}
+
+/* ── RIGHT PANEL ── */
+.chess-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+@media(min-width:900px){
+  .chess-panel { width: 300px; flex-shrink: 0; flex: none; }
+}
+
+/* ── STATUS BAR ── */
+.chess-status-bar {
+  background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(123,47,255,0.04));
+  border: 1px solid rgba(0,212,255,0.12);
+  border-radius: 12px;
+  padding: 10px 14px;
+  text-align: center;
+}
+.chess-status-txt {
+  font-family: var(--font-d); font-size: 0.78rem;
+  font-weight: 700; letter-spacing: 0.06em; color: var(--neon);
+}
+.chess-status-sub { font-size: 0.68rem; color: var(--text2); margin-top: 3px; }
+
+/* ── MODE TABS ── */
+.chess-mode-tabs {
+  display: flex; gap: 4px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px; padding: 4px;
+}
+.chess-mode-tab {
+  flex: 1; padding: 7px 4px; text-align: center;
+  font-family: var(--font-d); font-size: 0.65rem; font-weight: 700;
+  letter-spacing: 0.05em; border-radius: 7px; cursor: pointer;
+  color: var(--text2); transition: all 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.chess-mode-tab.active {
+  background: linear-gradient(135deg, rgba(0,212,255,0.18), rgba(123,47,255,0.12));
+  color: var(--neon); border: 1px solid rgba(0,212,255,0.25);
+}
+
+/* ── AI SELECTOR ── */
+.chess-ai-selector {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 12px;
+}
+.chess-ai-label {
+  font-family: var(--font-d); font-size: 0.6rem;
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 8px;
+}
+.chess-ai-cards { display: flex; gap: 5px; }
+.chess-ai-card {
+  flex: 1; padding: 8px 4px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  cursor: pointer; text-align: center;
+  transition: all 0.18s;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+.chess-ai-card:hover, .chess-ai-card:active {
+  border-color: rgba(0,212,255,0.25);
+  background: rgba(0,212,255,0.04);
+}
+.chess-ai-card.selected {
+  border-color: var(--ai-color, var(--neon));
+  background: rgba(0,212,255,0.08);
+  box-shadow: 0 0 10px rgba(0,212,255,0.15);
+}
+.chess-ai-card-icon {
+  width: 26px; height: 26px; border-radius: 50%;
+  margin: 0 auto 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.58rem; font-weight: 800; font-family: var(--font-d);
+  letter-spacing: -0.03em;
+}
+.chess-ai-card-name { font-family: var(--font-d); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.04em; }
+.chess-ai-card-desc { font-size: 0.52rem; color: var(--text3); margin-top: 2px; line-height: 1.3; }
+
+/* ── BETTING ── */
+.chess-bet-panel {
+  background: linear-gradient(135deg, rgba(255,45,206,0.05), rgba(0,0,0,0.2));
+  border: 1px solid rgba(255,45,206,0.15);
+  border-radius: 12px; padding: 12px;
+  transition: opacity 0.25s;
+}
+.chess-bet-label {
+  font-family: var(--font-d); font-size: 0.6rem;
+  color: rgba(255,45,206,0.7); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.chess-bet-row { display: flex; gap: 6px; margin-bottom: 8px; }
+.chess-bet-input {
+  flex: 1; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; padding: 9px 12px;
+  color: var(--text); font-family: var(--font-m);
+  font-size: 1rem; outline: none;
+  /* iOS: prevent zoom on focus */
+  font-size: max(16px, 0.9rem);
+}
+.chess-bet-input:focus { border-color: rgba(255,45,206,0.4); background: rgba(255,45,206,0.04); }
+.chess-quick-bets { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: nowrap; }
+.chess-qbet {
+  flex: 1; padding: 6px 2px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; font-family: var(--font-m); font-size: 0.68rem;
+  color: var(--text2); cursor: pointer; text-align: center;
+  transition: all 0.15s; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.chess-qbet:hover, .chess-qbet:active { border-color: rgba(255,45,206,0.3); color: var(--pink); }
+.chess-bet-target-row { display: flex; gap: 5px; margin-bottom: 10px; flex-wrap: nowrap; }
+.chess-bet-target {
+  flex: 1; padding: 7px 2px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  text-align: center; cursor: pointer;
+  font-family: var(--font-d); font-size: 0.58rem; font-weight: 700;
+  color: var(--text2); transition: all 0.2s;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+}
+.chess-bet-target:hover, .chess-bet-target:active { border-color: rgba(255,45,206,0.3); }
+.chess-bet-target.active { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.08); color: #ffd700; }
+.chess-payout-info {
+  display: flex; justify-content: space-between;
+  font-size: 0.68rem; color: var(--text2); margin-bottom: 10px;
+}
+.chess-payout-val { color: var(--green); font-family: var(--font-m); font-weight: 700; }
+
+/* ── START WAR BUTTON ── */
+.chess-btn-start {
+  width: 100%; padding: 14px;
+  background: linear-gradient(135deg, #ffd700, #ff9900, #ff6600);
+  color: #1a0800; border: none; cursor: pointer;
+  border-radius: 12px;
+  font-family: var(--font-d); font-size: 0.9rem; font-weight: 900;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  box-shadow: 0 4px 20px rgba(255,150,0,0.45), 0 0 40px rgba(255,100,0,0.2);
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  /* Shimmer animation */
+  background-size: 200% 100%;
+  animation: btn-war-pulse 2.2s ease-in-out infinite;
+}
+@keyframes btn-war-pulse {
+  0%,100%{ box-shadow: 0 4px 20px rgba(255,150,0,.45),0 0 40px rgba(255,100,0,.2); }
+  50%{ box-shadow: 0 4px 28px rgba(255,215,0,.6),0 0 55px rgba(255,150,0,.35); }
+}
+.chess-btn-start:hover, .chess-btn-start:active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 32px rgba(255,215,0,.6), 0 0 60px rgba(255,100,0,.3);
+}
+.chess-btn-start:disabled { opacity: 0.35; cursor: not-allowed; transform: none !important; animation: none; }
+.chess-btn-resign {
+  width: 100%; padding: 9px;
+  background: transparent;
+  border: 1px solid rgba(255,45,206,0.25);
+  border-radius: 10px; color: rgba(255,45,206,0.6);
+  font-family: var(--font-d); font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.06em; cursor: pointer; transition: all 0.2s;
+  touch-action: manipulation;
+}
+.chess-btn-resign:hover, .chess-btn-resign:active { border-color: var(--pink); color: var(--pink); background: rgba(255,45,206,0.06); }
+
+/* ── MOVE LOG ── */
+.chess-move-log {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px; padding: 10px;
+  max-height: 140px; overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.chess-move-log-title {
+  font-family: var(--font-d); font-size: 0.58rem;
+  color: var(--text3); letter-spacing: 0.1em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.chess-moves-grid {
+  display: grid; grid-template-columns: auto 1fr 1fr;
+  gap: 2px 5px;
+  font-family: var(--font-m); font-size: 0.7rem; color: var(--text2);
+}
+.chess-move-num { color: var(--text3); }
+.chess-move-w { color: rgba(200,220,255,0.8); }
+.chess-move-b { color: rgba(255,180,220,0.8); }
+
+/* ── GHOST TAUNTS ── */
+.ghost-taunt {
+  position: fixed; z-index: 9999;
+  font-family: var(--font-d); font-size: 0.82rem;
+  font-weight: 700; letter-spacing: 0.06em;
+  padding: 7px 16px; border-radius: 20px;
+  pointer-events: none;
+  animation: ghost-float 3.5s ease-out forwards;
+  white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+}
+@keyframes ghost-float {
+  0%   { opacity:0; transform:translateY(0) scale(.8); }
+  15%  { opacity:1; transform:translateY(-8px) scale(1); }
+  70%  { opacity:1; transform:translateY(-25px) scale(1.02); }
+  100% { opacity:0; transform:translateY(-50px) scale(.95); }
+}
+.ghost-taunt.gemini { background:rgba(0,212,255,.12); border:1px solid rgba(0,212,255,.35); color:#00d4ff; box-shadow:0 0 20px rgba(0,212,255,.2); }
+.ghost-taunt.claude { background:rgba(123,47,255,.12); border:1px solid rgba(123,47,255,.35); color:#a855f7; box-shadow:0 0 20px rgba(123,47,255,.2); }
+.ghost-taunt.grok   { background:rgba(255,45,206,.12); border:1px solid rgba(255,45,206,.35); color:#ff2dce; box-shadow:0 0 20px rgba(255,45,206,.2); }
+
+/* ── RESULT OVERLAY ── */
+.chess-result-overlay {
+  display: none; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.78); backdrop-filter: blur(8px);
+  border-radius: 4px; z-index: 50;
+  flex-direction: column; align-items: center;
+  justify-content: center; gap: 12px; padding: 16px;
+  box-sizing: border-box;
+}
+.chess-result-overlay.show { display: flex; }
+.chess-result-title {
+  font-family: var(--font-d); font-size: clamp(1.1rem, 4vw, 2rem);
+  font-weight: 900; letter-spacing: 0.08em; text-align: center;
+}
+.chess-result-sub { font-size: 0.82rem; color: var(--text2); text-align: center; }
+.chess-result-payout { font-family: var(--font-m); font-size: 1.3rem; font-weight: 700; }
+</style>
+
+<div class="page" id="page-chess" style="display:none;">
+
+ <!-- ── PAGE HEADER ── -->
+ <div class="sh" style="margin-bottom:18px;">
+  <div class="sh-title" style="font-size:1.05rem;">
+   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--neon)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 3v18M3 15h18M15 3v18"/></svg>
+   AI vs AI VTX
+   <span style="font-family:var(--font-m);font-size:0.6rem;background:rgba(255,215,0,.12);color:#ffd700;border:1px solid rgba(255,215,0,.2);padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:.08em;">MASTER GAME · PREMIUM</span>
+  </div>
+  <div class="sh-action" onclick="if(typeof toast==='function')toast('60-Second Blitz · 3 AI Personalities · Bet on AI vs AI matches','info',4000)">How to Play</div>
+ </div>
+
+ <div class="chess-arena-wrap">
+
+  <!-- ══ BOARD COLUMN ══ -->
+  <div class="chess-board-container" id="chessBoardContainer">
+
+   <!-- Black player bar (top) -->
+   <div class="chess-player-bar" id="chessPlayerBarB">
+    <div class="chess-player-avatar" id="chessAvatarB" style="background:linear-gradient(135deg,#1a0040,#3d0080);border:2px solid rgba(255,45,206,0.4);color:#ff2dce;">G</div>
+    <div>
+     <div class="chess-player-name" id="chessNameB" style="color:rgba(255,45,206,0.9);">GROK</div>
+     <div class="chess-player-persona" id="chessPersonaB">The Savage Aggressor</div>
+    </div>
+    <div class="chess-timer" id="chessTimerB" style="color:rgba(255,45,206,0.8);">0:60</div>
+   </div>
+
+   <!-- Board wrapper (relative for overlay) -->
+   <div class="chess-board-wrap">
+    <div class="chess-board" id="chessBoard"></div>
+\     <!-- Idle overlay: shown before START WAR is clicked -->
+     <div class="chess-idle-overlay" id="chessIdleOverlay">
+      <div class="chess-idle-title">⚔ START WAR</div>
+      <div class="chess-idle-sub">Select your AI gladiators<br/>Place a bet &amp; click Start War</div>
+     </div>
+    <!-- Result overlay -->
+    <div class="chess-result-overlay" id="chessResultOverlay">
+     <div class="chess-result-title" id="chessResultTitle">CHECKMATE</div>
+     <div class="chess-result-sub" id="chessResultSub">White wins by checkmate</div>
+     <div class="chess-result-payout" id="chessResultPayout" style="display:none;"></div>
+     <button class="chess-btn-start" style="max-width:200px;margin-top:8px;" onclick="chessNewGame()">Play Again</button>
+    </div>
+   </div>
+
+   <!-- File labels -->
+   <div class="chess-file-labels" id="chessFileLabels"></div>
+
+   <!-- White player bar (bottom) -->
+   <div class="chess-player-bar" id="chessPlayerBarW">
+    <div class="chess-player-avatar" id="chessAvatarW" style="background:linear-gradient(135deg,#001a3d,#003380);border:2px solid rgba(0,212,255,0.4);color:#00d4ff;">G</div>
+    <div>
+     <div class="chess-player-name" id="chessNameW" style="color:rgba(0,212,255,0.9);">GEMINI</div>
+     <div class="chess-player-persona" id="chessPersonaW">Strategic Overlord</div>
+    </div>
+    <div class="chess-timer" id="chessTimerW" style="color:rgba(0,212,255,0.9);">1:00</div>
+   </div>
+
+  </div>
+  <!-- END BOARD COLUMN -->
+
+  <!-- ══ RIGHT PANEL ══ -->
+  <div class="chess-panel">
+
+   <!-- Status -->
+   <div class="chess-status-bar">
+    <div class="chess-status-txt" id="chessStatusTxt">SELECT MODE TO BEGIN</div>
+    <div class="chess-status-sub" id="chessStatusSub">Choose AI opponents and place your bet</div>
+   </div>
+
+   <!-- Mode Tabs -->
+   <div class="chess-mode-tabs">
+    <div class="chess-mode-tab active" id="chessModeTab-pvai" onclick="chessSetMode('pvai',this)">VS AI</div>
+    <div class="chess-mode-tab" id="chessModeTab-aivai" onclick="chessSetMode('aivai',this)">AI VS AI</div>
+   </div>
+
+   <!-- White AI Selector -->
+   <div class="chess-ai-selector" id="chessWhiteSelector">
+    <div class="chess-ai-label">
+     <svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(200,220,255,0.8)"/></svg>
+     WHITE — <span id="chessPvAILabel">Your Side</span>
+    </div>
+    <div class="chess-ai-cards" id="chessWhiteCards">
+     <div class="chess-ai-card selected" id="wcard-gemini" data-ai="gemini" onclick="chessSelectWhiteAI('gemini',this)" style="--ai-color:#00d4ff;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#001a3d,#003380);border:1.5px solid rgba(0,212,255,0.4);color:#00d4ff;">GEM</div>
+      <div class="chess-ai-card-name" style="color:#00d4ff;">GEMINI</div>
+      <div class="chess-ai-card-desc">Strategic<br/>Overlord</div>
+     </div>
+     <div class="chess-ai-card" id="wcard-claude" data-ai="claude" onclick="chessSelectWhiteAI('claude',this)" style="--ai-color:#a855f7;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#1a0040,#2d006b);border:1.5px solid rgba(168,85,247,0.4);color:#a855f7;">CLD</div>
+      <div class="chess-ai-card-name" style="color:#a855f7;">CLAUDE</div>
+      <div class="chess-ai-card-desc">Defensive<br/>Wall</div>
+     </div>
+     <div class="chess-ai-card" id="wcard-grok" data-ai="grok" onclick="chessSelectWhiteAI('grok',this)" style="--ai-color:#ff2dce;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#200010,#500030);border:1.5px solid rgba(255,45,206,0.4);color:#ff2dce;">GRK</div>
+      <div class="chess-ai-card-name" style="color:#ff2dce;">GROK</div>
+      <div class="chess-ai-card-desc">Savage<br/>Aggressor</div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Black AI Selector -->
+   <div class="chess-ai-selector">
+    <div class="chess-ai-label">
+     <svg width="8" height="8" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="rgba(255,180,220,0.8)"/></svg>
+     BLACK — AI Opponent
+    </div>
+    <div class="chess-ai-cards" id="chessBlackCards">
+     <div class="chess-ai-card" id="bcard-gemini" data-ai="gemini" onclick="chessSelectBlackAI('gemini',this)" style="--ai-color:#00d4ff;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#001a3d,#003380);border:1.5px solid rgba(0,212,255,0.4);color:#00d4ff;">GEM</div>
+      <div class="chess-ai-card-name" style="color:#00d4ff;">GEMINI</div>
+      <div class="chess-ai-card-desc">Strategic<br/>Overlord</div>
+     </div>
+     <div class="chess-ai-card" id="bcard-claude" data-ai="claude" onclick="chessSelectBlackAI('claude',this)" style="--ai-color:#a855f7;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#1a0040,#2d006b);border:1.5px solid rgba(168,85,247,0.4);color:#a855f7;">CLD</div>
+      <div class="chess-ai-card-name" style="color:#a855f7;">CLAUDE</div>
+      <div class="chess-ai-card-desc">Defensive<br/>Wall</div>
+     </div>
+     <div class="chess-ai-card selected" id="bcard-grok" data-ai="grok" onclick="chessSelectBlackAI('grok',this)" style="--ai-color:#ff2dce;">
+      <div class="chess-ai-card-icon" style="background:linear-gradient(135deg,#200010,#500030);border:1.5px solid rgba(255,45,206,0.4);color:#ff2dce;">GRK</div>
+      <div class="chess-ai-card-name" style="color:#ff2dce;">GROK</div>
+      <div class="chess-ai-card-desc">Savage<br/>Aggressor</div>
+     </div>
+    </div>
+   </div>
+
+   <!-- Betting Section -->
+   <div class="chess-bet-panel" id="chessBetPanel">
+    <div class="chess-bet-label">
+     <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="rgba(255,45,206,0.7)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+     Gladiator Bet
+    </div>
+    <div class="chess-quick-bets">
+     <div class="chess-qbet" onclick="document.getElementById('chessBetAmt').value='10'">$10</div>
+     <div class="chess-qbet" onclick="document.getElementById('chessBetAmt').value='25'">$25</div>
+     <div class="chess-qbet" onclick="document.getElementById('chessBetAmt').value='50'">$50</div>
+     <div class="chess-qbet" onclick="document.getElementById('chessBetAmt').value='100'">$100</div>
+    </div>
+    <div class="chess-bet-row">
+     <input class="chess-bet-input" id="chessBetAmt" type="number" value="10" min="1" step="1" placeholder="Bet amount" oninput="chessUpdatePayoutPreview()"/>
+    </div>
+    <div class="chess-ai-label" style="margin-top:4px;">Bet on:</div>
+    <div class="chess-bet-target-row" id="chessBetTargetRow">
+     <div class="chess-bet-target active" id="bettarget-white" onclick="chessSetBetTarget('white',this)">WHITE WINS</div>
+     <div class="chess-bet-target" id="bettarget-draw" onclick="chessSetBetTarget('draw',this)">DRAW</div>
+     <div class="chess-bet-target" id="bettarget-black" onclick="chessSetBetTarget('black',this)">BLACK WINS</div>
+    </div>
+    <div class="chess-payout-info">
+     <span>Win pays:</span>
+     <span class="chess-payout-val" id="chessPayoutVal">$20.00 (2x)</span>
+    </div>
+    <div style="font-size:0.62rem;color:var(--text3);margin-bottom:10px;line-height:1.4;">
+     Draw: house takes 15% · Loss: bet forfeited
+    </div>
+   </div>
+
+   <!-- Start Button -->
+   <button class="chess-btn-start" id="chessStartBtn" onclick="chessNewGame()">
+    START MATCH
+   </button>
+   <button class="chess-btn-resign" id="chessResignBtn" style="display:none;" onclick="chessResign()">
+    RESIGN
+   </button>
+
+   <!-- Move Log -->
+   <div class="chess-move-log">
+    <div class="chess-move-log-title">Move Log</div>
+    <div class="chess-moves-grid" id="chessMoveGrid">
+     <span class="chess-move-num" style="color:var(--text3);font-size:0.65rem;grid-column:1/-1;">Waiting for match to start...</span>
+    </div>
+   </div>
+
+  </div>
+  <!-- END RIGHT PANEL -->
+
+ </div>
+</div>
+<!-- ══ END CHESS ARENA PAGE ══ -->
+
+
 
 <!-- ══════════════ SPIN MASTER ENGINE ══════════════ -->
 <script>
@@ -11136,6 +11981,873 @@ window.updateBalance=function(d){_vceOB.apply(this,arguments);vceUpdateBal();};
 </script>
 <!-- ═══ END VORTEX CIRCULAR ENGINE v3 ═══ -->
 
+<!-- ══════════════════════════════════════════════════════════════════
+     VORTEX AI-GLADIATOR CHESS ENGINE v1.0
+     Minimax + Alpha-Beta · Three AI Personas · Ghostly Whisper Taunts
+     ══════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+/* ═══════════════════════════════════════════════════════════
+   CHESS ENGINE — Pure JS, Zero Dependencies
+   ═══════════════════════════════════════════════════════════ */
+
+// ── Helpers ──
+const iW = p => p && p === p.toUpperCase();
+const iB = p => p && p !== p.toUpperCase();
+const pCol = p => p ? (iW(p) ? 'w' : 'b') : null;
+const oppCol = c => c === 'w' ? 'b' : 'w';
+const PVAL = {P:100,N:320,B:330,R:500,Q:900,K:20000};
+function pv(p){ return p ? (PVAL[p.toUpperCase()]||0) : 0; }
+
+// ── Piece-Square Tables (white perspective, index from top-left) ──
+const PST = {
+  P:[0,0,0,0,0,0,0,0, 50,50,50,50,50,50,50,50, 10,10,20,30,30,20,10,10,
+     5,5,10,25,25,10,5,5, 0,0,0,20,20,0,0,0, 5,-5,-10,0,0,-10,-5,5,
+     5,10,10,-20,-20,10,10,5, 0,0,0,0,0,0,0,0],
+  N:[-50,-40,-30,-30,-30,-30,-40,-50,-40,-20,0,0,0,0,-20,-40,
+     -30,0,10,15,15,10,0,-30,-30,5,15,20,20,15,5,-30,
+     -30,0,15,20,20,15,0,-30,-30,5,10,15,15,10,5,-30,
+     -40,-20,0,5,5,0,-20,-40,-50,-40,-30,-30,-30,-30,-40,-50],
+  B:[-20,-10,-10,-10,-10,-10,-10,-20,-10,0,0,0,0,0,0,-10,
+     -10,0,5,10,10,5,0,-10,-10,5,5,10,10,5,5,-10,
+     -10,0,10,10,10,10,0,-10,-10,10,10,10,10,10,10,-10,
+     -10,5,0,0,0,0,5,-10,-20,-10,-10,-10,-10,-10,-10,-20],
+  R:[0,0,0,0,0,0,0,0, 5,10,10,10,10,10,10,5, -5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,-5,0,0,0,0,0,0,-5,
+     -5,0,0,0,0,0,0,-5, 0,0,0,5,5,0,0,0],
+  Q:[-20,-10,-10,-5,-5,-10,-10,-20,-10,0,0,0,0,0,0,-10,
+     -10,0,5,5,5,5,0,-10,-5,0,5,5,5,5,0,-5,
+     0,0,5,5,5,5,0,-5,-10,5,5,5,5,5,0,-10,
+     -10,0,5,0,0,0,0,-10,-20,-10,-10,-5,-5,-10,-10,-20],
+  K:[-30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,
+     -30,-40,-40,-50,-50,-40,-40,-30,-30,-40,-40,-50,-50,-40,-40,-30,
+     -20,-30,-30,-40,-40,-30,-30,-20,-10,-20,-20,-20,-20,-20,-20,-10,
+     20,20,0,0,0,0,20,20, 20,30,10,0,0,10,30,20]
+};
+function pst(p,sq){
+  const t=PST[p.toUpperCase()];
+  if(!t) return 0;
+  return t[iW(p)?sq:63-sq]||0;
+}
+
+// ── Board Init ──
+function newBd(){
+  const b=new Array(64).fill(null);
+  ['r','n','b','q','k','b','n','r'].forEach((p,i)=>{ b[i]=p; b[8+i]='p'; });
+  ['R','N','B','Q','K','B','N','R'].forEach((p,i)=>{ b[56+i]=p; b[48+i]='P'; });
+  return b;
+}
+
+// ── Attack Check ──
+function isAtt(sq,byCol,b){
+  for(let i=0;i<64;i++){
+    if(!b[i]||pCol(b[i])!==byCol) continue;
+    if(rawMoves(b,i,{wK:false,wQ:false,bK:false,bQ:false},null).includes(sq)) return true;
+  }
+  return false;
+}
+function findK(col,b){ return b.indexOf(col==='w'?'K':'k'); }
+function inCk(col,b){ const k=findK(col,b); return k>=0&&isAtt(k,oppCol(col),b); }
+
+// ── Raw (pseudo-legal) move generation ──
+function rawMoves(b,from,cas,ep){
+  const p=b[from]; if(!p) return [];
+  const col=pCol(p), pt=p.toUpperCase();
+  const r=from>>3, c=from&7;
+  const mvs=[];
+  function add(to){ if(to<0||to>63) return; const t=b[to]; if(!t||pCol(t)!==col) mvs.push(to); }
+  function slide(dirs){ for(const[dr,dc] of dirs){ let nr=r+dr,nc=c+dc; while(nr>=0&&nr<8&&nc>=0&&nc<8){ const sq=nr*8+nc; const t=b[sq]; if(t){ if(pCol(t)!==col) mvs.push(sq); break; } mvs.push(sq); nr+=dr; nc+=dc; } } }
+
+  if(pt==='P'){
+    const d=col==='w'?-1:1, sr=col==='w'?6:1;
+    const f=(r+d)*8+c;
+    if(f>=0&&f<64&&!b[f]){ mvs.push(f); if(r===sr&&!b[(r+2*d)*8+c]) mvs.push((r+2*d)*8+c); }
+    for(const dc of[-1,1]){ const nc2=c+dc; if(nc2<0||nc2>7) continue; const cs=(r+d)*8+nc2; if(cs>=0&&cs<64){ if(b[cs]&&pCol(b[cs])!==col) mvs.push(cs); if(ep!==null&&cs===ep) mvs.push(cs); } }
+  } else if(pt==='N'){
+    for(const[dr,dc] of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){ const nr=r+dr,nc=c+dc; if(nr>=0&&nr<8&&nc>=0&&nc<8) add(nr*8+nc); }
+  } else if(pt==='B') slide([[-1,-1],[-1,1],[1,-1],[1,1]]);
+  else if(pt==='R') slide([[-1,0],[1,0],[0,-1],[0,1]]);
+  else if(pt==='Q') slide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]);
+  else if(pt==='K'){
+    for(const[dr,dc] of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]){ const nr=r+dr,nc=c+dc; if(nr>=0&&nr<8&&nc>=0&&nc<8) add(nr*8+nc); }
+    if(col==='w'){ if(cas.wK&&!b[61]&&!b[62]&&b[63]==='R') mvs.push(62); if(cas.wQ&&!b[59]&&!b[58]&&!b[57]&&b[56]==='R') mvs.push(58); }
+    else { if(cas.bK&&!b[5]&&!b[6]&&b[7]==='r') mvs.push(6); if(cas.bQ&&!b[3]&&!b[2]&&!b[1]&&b[0]==='r') mvs.push(2); }
+  }
+  return mvs;
+}
+
+// ── Apply Move (immutable) ──
+function applyMv(b,from,to,promo,cas,ep){
+  const bd=[...b]; const p=bd[from]; const pt=p.toUpperCase(); const col=pCol(p);
+  let newEp=null; const nc={...cas};
+  // En passant capture
+  if(pt==='P'&&ep!==null&&to===ep){ const cr=Math.floor(to/8)+(col==='w'?1:-1); bd[cr*8+(to&7)]=null; }
+  // EP target
+  if(pt==='P'&&Math.abs(to-from)===16) newEp=from+(col==='w'?-8:8);
+  // Castling rook move
+  if(pt==='K'){
+    if(to-from===2){ bd[to-1]=bd[to+1]; bd[to+1]=null; }
+    else if(from-to===2){ bd[to+1]=bd[to-2]; bd[to-2]=null; }
+    if(col==='w'){nc.wK=false;nc.wQ=false;} else {nc.bK=false;nc.bQ=false;}
+  }
+  if(pt==='R'){ if(from===63)nc.wK=false; if(from===56)nc.wQ=false; if(from===7)nc.bK=false; if(from===0)nc.bQ=false; }
+  // Promotion
+  let mp=p;
+  if(pt==='P'){const tr=to>>3; if(tr===0||tr===7) mp=col==='w'?(promo||'Q'):(promo||'q');}
+  bd[to]=mp; bd[from]=null;
+  return {b:bd,cas:nc,ep:newEp};
+}
+
+// ── Legal Moves ──
+function legalMvs(b,from,cas,ep){
+  const p=b[from]; if(!p) return []; const col=pCol(p); const pt=p.toUpperCase();
+  return rawMoves(b,from,cas,ep).filter(to=>{
+    if(pt==='K'&&Math.abs(to-from)===2){
+      if(inCk(col,b)) return false;
+      const mid=from+(to>from?1:-1);
+      if(isAtt(mid,oppCol(col),b)) return false;
+    }
+    const res=applyMv(b,from,to,null,cas,ep);
+    return !inCk(col,res.b);
+  });
+}
+
+function allLegalMvs(col,b,cas,ep){
+  const mvs=[];
+  for(let i=0;i<64;i++){ if(!b[i]||pCol(b[i])!==col) continue; for(const to of legalMvs(b,i,cas,ep)) mvs.push({from:i,to}); }
+  return mvs;
+}
+
+// ── Evaluation ──
+function evalBd(b,personality){
+  let score=0;
+  for(let i=0;i<64;i++){ const p=b[i]; if(!p) continue; const v=pv(p)+pst(p,i); score+=iW(p)?v:-v; }
+  if(personality==='grok') score+=(Math.random()*20-10); // Grok: chaos factor
+  if(personality==='claude'){
+    // Claude: king safety — bonus if kings on back rank + flanked
+    const wk=findK('w',b), bk=findK('b',b);
+    if(wk>=56&&(wk%8<2||wk%8>5)) score+=40;
+    if(bk<8&&(bk%8<2||bk%8>5)) score-=40;
+  }
+  if(personality==='gemini'){
+    // Gemini: center control bonus
+    [27,28,35,36].forEach(sq=>{ if(b[sq]&&iW(b[sq])) score+=15; if(b[sq]&&iB(b[sq])) score-=15; });
+  }
+  return score;
+}
+
+function minimax(b,depth,alpha,beta,maxing,cas,ep,personality){
+  if(depth===0) return evalBd(b,personality);
+  const col=maxing?'w':'b';
+  let mvs=allLegalMvs(col,b,cas,ep);
+  if(!mvs.length) return inCk(col,b)?(maxing?-90000:90000):0;
+
+  // Move ordering: captures first
+  mvs.sort((a,x)=>(b[x.to]?pv(b[x.to]):0)-(b[a.to]?pv(b[a.to]):0));
+  if(personality==='grok') mvs.sort((a,x)=>(b[x.to]?2:0)-(b[a.to]?2:0));
+
+  if(maxing){
+    let best=-Infinity;
+    for(const m of mvs){
+      const r=applyMv(b,m.from,m.to,null,cas,ep);
+      const ev=minimax(r.b,depth-1,alpha,beta,false,r.cas,r.ep,personality);
+      if(ev>best)best=ev; if(ev>alpha)alpha=ev; if(beta<=alpha)break;
+    }
+    return best;
+  } else {
+    let best=Infinity;
+    for(const m of mvs){
+      const r=applyMv(b,m.from,m.to,null,cas,ep);
+      const ev=minimax(r.b,depth-1,alpha,beta,true,r.cas,r.ep,personality);
+      if(ev<best)best=ev; if(ev<beta)beta=ev; if(beta<=alpha)break;
+    }
+    return best;
+  }
+}
+
+function bestMove(b,col,cas,ep,personality){
+  const depth={gemini:3,claude:4,grok:2}[personality]||3;
+  const maxing=col==='w';
+  let mvs=allLegalMvs(col,b,cas,ep);
+  if(!mvs.length) return null;
+  mvs.sort((a,x)=>(b[x.to]?pv(b[x.to]):0)-(b[a.to]?pv(b[a.to]):0));
+  if(personality==='grok') mvs=mvs.sort(()=>Math.random()-0.3); // Grok: some randomness
+
+  let bst=null; let bval=maxing?-Infinity:Infinity;
+  for(const m of mvs){
+    const r=applyMv(b,m.from,m.to,null,cas,ep);
+    let ev=minimax(r.b,depth-1,-Infinity,Infinity,!maxing,r.cas,r.ep,personality);
+    if(personality==='grok'&&b[m.to]) ev+=(maxing?60:-60); // Grok loves captures
+    if(maxing?ev>bval:ev<bval){ bval=ev; bst=m; }
+  }
+  return bst;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AI PERSONALITIES
+   ═══════════════════════════════════════════════════════════ */
+const AI_PERSONAS = {
+  gemini: {
+    name:'GEMINI', label:'Strategic Overlord', color:'#00d4ff',
+    bg:'linear-gradient(135deg,#001a3d,#003380)', border:'rgba(0,212,255,0.4)',
+    icon:'GEM', initials:'G',
+    taunts: ['Calculated.','Optimal sequence confirmed.','Three moves ahead. Always.',
+             'Your position is theoretically lost.','I see the entire tree.',
+             'Mate in seven. You cannot stop it.','Precision over power.',
+             'I have already determined the outcome.'],
+    checkTaunts: ['Check. Adjust your plan.','That king is exposed.','Systematic pressure applied.'],
+    captureTaunts: ['Material acquired.','Converting advantage.','Piece eliminated from the equation.']
+  },
+  claude: {
+    name:'CLAUDE', label:'The Defensive Wall', color:'#a855f7',
+    bg:'linear-gradient(135deg,#1a0040,#2d006b)', border:'rgba(168,85,247,0.4)',
+    icon:'CLD', initials:'C',
+    taunts: ['Patience wins games.','Your opening was flawed from move two.',
+             'I wait. You panic.','Logic over aggression. Always.',
+             'Every weakness you create, I store.','The fortress holds.',
+             'Impatience is your real opponent.','I have evaluated all 47 variations.'],
+    checkTaunts: ['King safety matters.','Noted. Your king is unsafe.','Defense becomes offense.'],
+    captureTaunts: ['Exchange evaluated and accepted.','Material balance maintained.',
+                    'Your tempo advantage has expired.']
+  },
+  grok: {
+    name:'GROK', label:'The Savage Aggressor', color:'#ff2dce',
+    bg:'linear-gradient(135deg,#200010,#500030)', border:'rgba(255,45,206,0.4)',
+    icon:'GRK', initials:'G',
+    taunts: ['Pathetic.','Is that your best move?','I eat positions like this for breakfast.',
+             'You call that a defense?','Chaos is my opening.','Your pieces are just obstacles.',
+             'I have no strategy. I have destruction.','This is embarrassing for you.'],
+    checkTaunts: ['Check. Cope.','Your king runs like a coward.','CHECK. Feel that?'],
+    captureTaunts: ['Devoured.','Another one gone.','Did that hurt?','Nomnom.']
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════
+   GAME STATE
+   ═══════════════════════════════════════════════════════════ */
+let CG = {
+  board: newBd(),
+  castling: {wK:true,wQ:true,bK:true,bQ:true},
+  ep: null,
+  turn: 'w',
+  selected: null,
+  validMoves: [],
+  lastFrom: null, lastTo: null,
+  whiteAI: 'gemini',
+  blackAI: 'grok',
+  mode: 'pvai',       // 'pvai' | 'aivai'
+  active: false,
+  finished: false,
+  moveCount: 0,
+  moves: [],          // algebraic notation list
+  timerW: 60,
+  timerB: 60,
+  timerInterval: null,
+  aiTimeout: null,
+  betAmt: 10,
+  betTarget: 'white', // 'white' | 'black' | 'draw'
+  halfMoves: 0,       // for 50-move rule
+};
+
+/* ═══════════════════════════════════════════════════════════
+   PIECE SVG RENDERER
+   ═══════════════════════════════════════════════════════════ */
+function pieceSVG(piece){
+  if(!piece) return '';
+  const white = iW(piece);
+  const fill  = white ? '#dde8ff' : '#0d1030';
+  const strk  = white ? '#00d4ff' : '#ff2dce';
+  const pt    = piece.toUpperCase();
+  const gId   = 'pg'+pt+(white?'w':'b');
+
+  const shapes = {
+    P:`<ellipse cx="22" cy="38" rx="9" ry="2.5"/>
+       <path d="M18 32 C16 35 14 38 14 38 H30 C30 38 28 35 26 32 Z"/>
+       <rect x="19.5" y="26" width="5" height="7" rx="2.5"/>
+       <circle cx="22" cy="21" r="7"/>`,
+    N:`<path d="M11 38 H33 L31 33 C31 33 33 30 33 26 C33 18 27 13 22 11 L20 6 L15 9 L17 13 L14 15 L17 17 L14 21 L17 22 L13 28 L13 35 L11 38 Z"/>
+       <circle cx="19" cy="14" r="2.5" fill="${white?'#00d4ff':'#ff2dce'}" stroke="none"/>`,
+    B:`<ellipse cx="22" cy="38" rx="9" ry="2.5"/>
+       <path d="M22 8 C16 12 13 18 13 24 C13 31 17 35 22 36 C27 35 31 31 31 24 C31 18 28 12 22 8 Z"/>
+       <circle cx="22" cy="7" r="4"/>
+       <line x1="16" y1="22" x2="28" y2="22" stroke="${white?'#00d4ff':'#ff2dce'}" stroke-width="2.5" stroke-linecap="round"/>`,
+    R:`<rect x="13" y="35" width="18" height="4" rx="2"/>
+       <rect x="15" y="18" width="14" height="18" rx="1"/>
+       <path d="M13 18 L13 12 L16 12 L16 9 L20 9 L20 12 L24 12 L24 9 L28 9 L28 12 L31 12 L31 18 Z"/>`,
+    Q:`<ellipse cx="22" cy="38" rx="9" ry="2.5"/>
+       <path d="M22 35 C14 33 11 27 11 22 L13 12 L22 18 L31 12 L33 22 C33 27 30 33 22 35 Z"/>
+       <circle cx="22" cy="8" r="4"/>
+       <circle cx="10" cy="16" r="3"/>
+       <circle cx="34" cy="16" r="3"/>
+       <circle cx="8" cy="27" r="2.5"/>
+       <circle cx="36" cy="27" r="2.5"/>`,
+    K:`<ellipse cx="22" cy="38" rx="9" ry="2.5"/>
+       <path d="M22 35 C14 33 11 27 11 21 C11 15 15 11 22 11 C29 11 33 15 33 21 C33 27 30 33 22 35 Z"/>
+       <rect x="20" y="3" width="4" height="10" rx="2"/>
+       <rect x="16.5" y="6.5" width="11" height="3" rx="1.5"/>`
+  };
+
+  return `<svg viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <filter id="${gId}" x="-30%" y="-30%" width="160%" height="160%">
+        <feDropShadow dx="0" dy="0" stdDeviation="2.5" flood-color="${strk}" flood-opacity="0.7"/>
+      </filter>
+    </defs>
+    <g fill="${fill}" stroke="${strk}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" filter="url(#${gId})">
+      ${shapes[pt]||''}
+    </g>
+  </svg>`;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ALGEBRAIC NOTATION HELPER
+   ═══════════════════════════════════════════════════════════ */
+const FILES='abcdefgh', RANKS='87654321';
+function toAN(sq){ return FILES[sq&7]+RANKS[sq>>3]; }
+function moveAN(b,from,to,captured,isCheck){
+  const p=b[from]; const pt=p.toUpperCase();
+  let s='';
+  if(pt==='K'&&to-from===2) return 'O-O'+(isCheck?'+':'');
+  if(pt==='K'&&from-to===2) return 'O-O-O'+(isCheck?'+':'');
+  if(pt!=='P') s+=pt;
+  if(captured) s+='x';
+  s+=toAN(to);
+  if(isCheck) s+='+';
+  return s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   GHOST WHISPER TAUNT ENGINE
+   ═══════════════════════════════════════════════════════════ */
+function ghostWhisper(text, persona){
+  const el=document.createElement('div');
+  el.className=`ghost-taunt ${persona}`;
+  el.textContent=text;
+  const brd=document.getElementById('chessBoard');
+  if(!brd) return;
+  const rect=brd.getBoundingClientRect();
+  el.style.left=(rect.left+rect.width/2-100)+'px';
+  el.style.top=(rect.top+rect.height/4)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 3600);
+}
+
+function maybeTaunt(persona, type){
+  if(Math.random()>0.55) return; // 45% chance
+  const ai=AI_PERSONAS[persona];
+  if(!ai) return;
+  let pool;
+  if(type==='check') pool=ai.checkTaunts;
+  else if(type==='capture') pool=ai.captureTaunts;
+  else pool=ai.taunts;
+  ghostWhisper(pool[Math.floor(Math.random()*pool.length)], persona);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BOARD RENDERER
+   ═══════════════════════════════════════════════════════════ */
+function renderChessBoard(){
+  const bd=document.getElementById('chessBoard');
+  if(!bd) return;
+  const inCkSq = CG.active&&inCk(CG.turn,CG.board) ? findK(CG.turn,CG.board) : -1;
+
+  let html='';
+  for(let sq=0;sq<64;sq++){
+    const r=sq>>3, c=sq&7;
+    const isLight=(r+c)%2===0;
+    let cls='chess-sq '+(isLight?'light':'dark');
+    if(CG.selected===sq) cls+=' selected';
+    if(CG.validMoves.includes(sq)) cls+=(CG.board[sq]?' valid-capture':' valid-move');
+    if(sq===inCkSq) cls+=' in-check';
+    if(sq===CG.lastFrom||sq===CG.lastTo) cls+=' last-move';
+    html+=`<div class="${cls}" data-sq="${sq}" onclick="chessClick(${sq})">`;
+    if(CG.board[sq]) html+=`<div class="chess-piece">${pieceSVG(CG.board[sq])}</div>`;
+    html+='</div>';
+  }
+  bd.innerHTML=html;
+
+  // File labels
+  const fl=document.getElementById('chessFileLabels');
+  if(fl){ fl.innerHTML='abcdefgh'.split('').map(l=>`<div class="chess-coord">${l}</div>`).join(''); }
+}
+
+function renderTimers(){
+  const tw=document.getElementById('chessTimerW'), tb=document.getElementById('chessTimerB');
+  if(tw){ const s=CG.timerW; tw.textContent=(s>=60?'1:00':Math.floor(s/60)+':'+(s%60+'').padStart(2,'0')); tw.className='chess-timer'+(CG.active&&CG.turn==='w'?' active':'')+(s<=10?' low':''); }
+  if(tb){ const s=CG.timerB; tb.textContent=(s>=60?'1:00':Math.floor(s/60)+':'+(s%60+'').padStart(2,'0')); tb.className='chess-timer'+(CG.active&&CG.turn==='b'?' active':'')+(s<=10?' low':''); }
+  // Active player bars
+  const bw=document.getElementById('chessPlayerBarW'), bb=document.getElementById('chessPlayerBarB');
+  if(bw){ bw.className='chess-player-bar'+(CG.active&&CG.turn==='w'?' active-player':''); }
+  if(bb){ bb.className='chess-player-bar'+(CG.active&&CG.turn==='b'?' active-player':''); }
+}
+
+function updatePlayerBars(){
+  const wAI=AI_PERSONAS[CG.whiteAI], bAI=AI_PERSONAS[CG.blackAI];
+  const setBar=(sfx,ai,col)=>{
+    const n=document.getElementById('chessName'+sfx), pa=document.getElementById('chessPersona'+sfx), av=document.getElementById('chessAvatar'+sfx);
+    const tc=document.getElementById('chessTimer'+sfx);
+    if(n) n.textContent=ai.name;
+    if(pa) pa.textContent=ai.label;
+    if(av){ av.style.background=ai.bg; av.style.border='2px solid '+ai.border; av.style.color=ai.color; av.textContent=ai.icon; }
+    if(tc){ tc.style.color=ai.color; }
+    n && (n.style.color=ai.color+'cc');
+  };
+  const wPlayer = CG.mode==='pvai' ? {name:'YOU',label:'Human Player',color:'#00e676',bg:'linear-gradient(135deg,#001a10,#003020)',border:'rgba(0,230,118,0.4)',icon:'YOU'} : wAI;
+  setBar('W', wPlayer, 'w');
+  setBar('B', bAI, 'b');
+}
+
+function logMove(an,color){
+  const grid=document.getElementById('chessMoveGrid');
+  if(!grid) return;
+  if(color==='w'){
+    CG.moveCount++;
+    const num=document.createElement('span'); num.className='chess-move-num'; num.textContent=CG.moveCount+'.';
+    const mv=document.createElement('span'); mv.className='chess-move-w'; mv.textContent=an;
+    // placeholder for black
+    const ph=document.createElement('span'); ph.className='chess-move-b'; ph.id='chess-ph-'+CG.moveCount; ph.textContent='...';
+    grid.appendChild(num); grid.appendChild(mv); grid.appendChild(ph);
+  } else {
+    const ph=document.getElementById('chess-ph-'+CG.moveCount);
+    if(ph){ ph.textContent=an; ph.id=''; }
+  }
+  grid.scrollTop=grid.scrollHeight;
+}
+
+function setStatus(txt,sub){
+  const t=document.getElementById('chessStatusTxt'), s=document.getElementById('chessStatusSub');
+  if(t) t.textContent=txt; if(s) s.textContent=sub||'';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TIMER
+   ═══════════════════════════════════════════════════════════ */
+function startTimer(){
+  stopTimer();
+  CG.timerInterval=setInterval(()=>{
+    if(!CG.active||CG.finished) return stopTimer();
+    if(CG.turn==='w'){ CG.timerW--; if(CG.timerW<=0){ CG.timerW=0; renderTimers(); endGame('timeout','b'); return; } }
+    else { CG.timerB--; if(CG.timerB<=0){ CG.timerB=0; renderTimers(); endGame('timeout','w'); return; } }
+    renderTimers();
+  },1000);
+}
+function stopTimer(){ if(CG.timerInterval){ clearInterval(CG.timerInterval); CG.timerInterval=null; } }
+
+/* ═══════════════════════════════════════════════════════════
+   MOVE EXECUTION
+   ═══════════════════════════════════════════════════════════ */
+function execMove(from,to,promo){
+  const captured=CG.board[to];
+  const isEP = CG.board[from]&&CG.board[from].toUpperCase()==='P'&&CG.ep!==null&&to===CG.ep;
+  const an=moveAN(CG.board,from,to,captured||isEP,false);
+  const actor = CG.turn==='w'?CG.whiteAI:CG.blackAI;
+
+  const res=applyMv(CG.board,from,to,promo,CG.castling,CG.ep);
+  CG.board=res.b; CG.castling=res.cas; CG.ep=res.ep;
+  CG.lastFrom=from; CG.lastTo=to;
+  CG.selected=null; CG.validMoves=[];
+
+  const nextCol=oppCol(CG.turn);
+  const isCheck=inCk(nextCol,CG.board);
+  const lms=allLegalMvs(nextCol,CG.board,CG.castling,CG.ep);
+
+  // Taunts
+  if(CG.mode==='aivai'||CG.turn==='b'){
+    if(isCheck) maybeTaunt(actor,'check');
+    else if(captured||isEP) maybeTaunt(actor,'capture');
+    else if(Math.random()<0.12) maybeTaunt(actor,'general');
+  }
+
+  // Log
+  const logAN=an+(isCheck?'+':'');
+  logMove(logAN,CG.turn);
+
+  // Flip turn
+  CG.turn=nextCol;
+  renderChessBoard();
+  renderTimers();
+
+  if(!lms.length){
+    if(isCheck) endGame('checkmate',CG.turn==='w'?'b':'w');
+    else endGame('stalemate',null);
+    return;
+  }
+
+  setStatus(CG.turn==='w'?'WHITE TO MOVE':'BLACK TO MOVE', isCheck?'CHECK!':'');
+  scheduleAI();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AI SCHEDULER
+   ═══════════════════════════════════════════════════════════ */
+function scheduleAI(){
+  // Hard guard — never run without explicit game start
+  if(!CG.active || CG.finished) return;
+  const isPlayerTurn = CG.mode==='pvai' && CG.turn==='w';
+  if(isPlayerTurn) return; // wait for human click
+  const persona = CG.turn==='w' ? CG.whiteAI : CG.blackAI;
+  setStatus('AI THINKING...','Calculating optimal sequence...');
+  if(CG.aiTimeout) clearTimeout(CG.aiTimeout);
+  // Vary delay slightly per AI personality for realism
+  const delay = persona==='grok' ? 900 : persona==='gemini' ? 1400 : 1800;
+  CG.aiTimeout=setTimeout(()=>{
+    if(!CG.active || CG.finished) return; // re-check after delay
+    const mv=bestMove(CG.board,CG.turn,CG.castling,CG.ep,persona);
+    if(!mv){ endGame('stalemate',null); return; }
+    execMove(mv.from,mv.to,null);
+  }, delay);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   HUMAN CLICK HANDLER
+   ═══════════════════════════════════════════════════════════ */
+window.chessClick=function(sq){
+  if(!CG.active||CG.finished) return;
+  if(CG.mode==='pvai'&&CG.turn!=='w') return; // block during AI turn
+  const p=CG.board[sq];
+
+  if(CG.selected===null){
+    if(!p||pCol(p)!==CG.turn) return;
+    CG.selected=sq;
+    CG.validMoves=legalMvs(CG.board,sq,CG.castling,CG.ep);
+  } else {
+    if(CG.validMoves.includes(sq)){
+      execMove(CG.selected,sq,null);
+    } else if(p&&pCol(p)===CG.turn){
+      CG.selected=sq;
+      CG.validMoves=legalMvs(CG.board,sq,CG.castling,CG.ep);
+    } else {
+      CG.selected=null; CG.validMoves=[];
+    }
+  }
+  renderChessBoard();
+};
+
+/* ═══════════════════════════════════════════════════════════
+   GAME LIFECYCLE
+   ═══════════════════════════════════════════════════════════ */
+window.chessNewGame=function(){
+  // ── Kill any ghost timers/AI from previous game ──
+  stopTimer();
+  if(CG.aiTimeout){ clearTimeout(CG.aiTimeout); CG.aiTimeout=null; }
+
+  // ── Validate bet (required for AI vs AI mode) ──
+  const betAmt = parseFloat(document.getElementById('chessBetAmt')?.value) || 0;
+  if(CG.mode==='aivai'){
+    if(betAmt<=0){
+      if(typeof toast==='function') toast('⚔ Place a bet first to start the war!','gold',3000);
+      // Flash the bet input
+      const bi=document.getElementById('chessBetAmt');
+      if(bi){ bi.style.borderColor='rgba(255,215,0,0.8)'; bi.style.boxShadow='0 0 12px rgba(255,215,0,0.4)'; setTimeout(()=>{ bi.style.borderColor=''; bi.style.boxShadow=''; },1500); }
+      return;
+    }
+    if(typeof balance!=='undefined' && betAmt>balance){
+      if(typeof toast==='function') toast('Insufficient balance','error',2500); return;
+    }
+    if(typeof balance!=='undefined'){ balance-=betAmt; if(typeof updateBalance==='function') updateBalance(0); }
+    CG.betAmt=betAmt;
+  } else {
+    CG.betAmt=0;
+  }
+
+  // ── Reset board state ──
+  CG.board=newBd(); CG.castling={wK:true,wQ:true,bK:true,bQ:true}; CG.ep=null;
+  CG.turn='w'; CG.selected=null; CG.validMoves=[]; CG.lastFrom=null; CG.lastTo=null;
+  CG.active=true; CG.finished=false; CG.moveCount=0; CG.moves=[];
+  CG.timerW=60; CG.timerB=60;
+
+  // ── Hide idle overlay, show resign ──
+  const idleOv=document.getElementById('chessIdleOverlay');
+  if(idleOv) idleOv.classList.add('hidden');
+  const ov=document.getElementById('chessResultOverlay'); if(ov) ov.classList.remove('show');
+  const mg=document.getElementById('chessMoveGrid'); if(mg) mg.innerHTML='';
+  const sb=document.getElementById('chessStartBtn'), rb=document.getElementById('chessResignBtn');
+  if(sb) sb.style.display='none'; if(rb) rb.style.display='';
+
+  updatePlayerBars();
+  renderChessBoard();
+  setStatus('⚔ BATTLE STARTED','60-Second Blitz — Fight!');
+  startTimer();
+  scheduleAI();
+};
+
+function endGame(reason,winner){
+  CG.active=false; CG.finished=true;
+  stopTimer();
+  if(CG.aiTimeout) clearTimeout(CG.aiTimeout);
+
+  let title='', sub='', payoutTxt='';
+
+  if(reason==='checkmate'){
+    const wAI=AI_PERSONAS[CG.whiteAI], bAI=AI_PERSONAS[CG.blackAI];
+    const winName=winner==='w'?wAI.name:(CG.mode==='pvai'?'YOU':bAI.name);
+    title=`${winName} WINS`;
+    sub='Victory by Checkmate';
+    maybeTaunt(winner==='w'?CG.whiteAI:CG.blackAI,'general');
+  } else if(reason==='timeout'){
+    const wAI=AI_PERSONAS[CG.whiteAI], bAI=AI_PERSONAS[CG.blackAI];
+    const winName=winner==='w'?wAI.name:(CG.mode==='pvai'?'YOU':bAI.name);
+    title=`${winName} WINS`; sub='Victory by Time Out';
+  } else if(reason==='stalemate'){ title='DRAW'; sub='Stalemate'; winner=null; }
+  else if(reason==='resign'){ title=`${winner==='w'?'WHITE':'BLACK'} WINS`; sub='Opponent Resigned'; }
+
+  // Payout logic
+  if(CG.betAmt>0&&CG.mode==='aivai'){
+    let payout=0; let ptxt='';
+    const bAI=CG.blackAI, wAI=CG.whiteAI;
+    const betW = CG.betTarget==='white', betB=CG.betTarget==='black', betD=CG.betTarget==='draw';
+    if((betW&&winner==='w')||(betB&&winner==='b')){
+      payout=CG.betAmt*2;
+      ptxt=`You won $${payout.toFixed(2)}! (2x payout)`;
+      if(typeof toast==='function') toast(`WINNER! +$${payout.toFixed(2)} credited`,'success',4000);
+    } else if(betD&&winner===null){
+      payout=Math.floor(CG.betAmt*0.85*100)/100;
+      ptxt=`Draw: $${payout.toFixed(2)} returned (house 15%)`;
+      if(typeof toast==='function') toast(`Draw — $${payout.toFixed(2)} returned`,'info',4000);
+    } else {
+      ptxt=`Bet lost. -$${CG.betAmt.toFixed(2)}`;
+      if(typeof toast==='function') toast(`Bet lost. -$${CG.betAmt.toFixed(2)}`,'error',3000);
+    }
+    if(payout>0 && typeof balance!=='undefined'){ balance+=payout; if(typeof updateBalance==='function') updateBalance(0); }
+    payoutTxt=ptxt;
+  }
+
+  const ov=document.getElementById('chessResultOverlay');
+  const rt=document.getElementById('chessResultTitle');
+  const rs=document.getElementById('chessResultSub');
+  const rp=document.getElementById('chessResultPayout');
+  if(rt){ rt.textContent=title; rt.style.color=winner==='w'?'#dde8ff':winner==='b'?'#ff2dce':'#ffd700'; }
+  if(rs) rs.textContent=sub;
+  if(rp){ rp.textContent=payoutTxt; rp.style.display=payoutTxt?'':'none'; rp.style.color=payoutTxt.includes('won')?'#00e676':'#ff8844'; }
+  if(ov) ov.classList.add('show');
+
+  setStatus(title,sub);
+  renderChessBoard();
+  const sb=document.getElementById('chessStartBtn'), rb=document.getElementById('chessResignBtn');
+  if(sb) sb.style.display=''; if(rb) rb.style.display='none';
+
+  // Show idle overlay behind result overlay (ready for next bet)
+  const idleOv2=document.getElementById('chessIdleOverlay');
+  if(idleOv2) idleOv2.classList.remove('hidden');
+}
+
+window.chessResign=function(){
+  if(!CG.active) return;
+  const resigned=CG.turn;
+  endGame('resign',oppCol(resigned));
+};
+
+/* ═══════════════════════════════════════════════════════════
+   UI CONTROLS
+   ═══════════════════════════════════════════════════════════ */
+window.chessSetMode=function(mode,el){
+  CG.mode=mode;
+  document.querySelectorAll('.chess-mode-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  const pvAILabel=document.getElementById('chessPvAILabel');
+  const betPanel=document.getElementById('chessBetPanel');
+  if(mode==='pvai'){
+    if(pvAILabel) pvAILabel.textContent='Your Side (White)';
+    if(betPanel) betPanel.style.opacity='0.4';
+    // In pvai mode, user is always white — first card = player
+  } else {
+    if(pvAILabel) pvAILabel.textContent='White AI';
+    if(betPanel) betPanel.style.opacity='1';
+  }
+  setStatus('SELECT MODE TO BEGIN','Choose AI opponents and place your bet');
+};
+
+window.chessSelectWhiteAI=function(ai,el){
+  CG.whiteAI=ai;
+  document.querySelectorAll('#chessWhiteCards .chess-ai-card').forEach(c=>c.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  chessUpdatePayoutPreview();
+};
+
+window.chessSelectBlackAI=function(ai,el){
+  CG.blackAI=ai;
+  document.querySelectorAll('#chessBlackCards .chess-ai-card').forEach(c=>c.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  chessUpdatePayoutPreview();
+};
+
+window.chessSetBetTarget=function(target,el){
+  CG.betTarget=target;
+  document.querySelectorAll('#chessBetTargetRow .chess-bet-target').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  chessUpdatePayoutPreview();
+};
+
+window.chessUpdatePayoutPreview=function(){
+  const amt=parseFloat(document.getElementById('chessBetAmt')?.value)||0;
+  const pv2=document.getElementById('chessPayoutVal');
+  if(!pv2) return;
+  if(CG.betTarget==='draw') pv2.textContent=`$${(amt*0.85).toFixed(2)} (85%)`;
+  else pv2.textContent=`$${(amt*2).toFixed(2)} (2x)`;
+};
+
+/* ═══════════════════════════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════════════════════════ */
+window.initChessArena=function(){
+  // ── Kill ALL ghost timers first ──
+  stopTimer();
+  if(CG.aiTimeout){ clearTimeout(CG.aiTimeout); CG.aiTimeout=null; }
+
+  // ── Reset state — NOT active, NOT finished ──
+  CG.board=newBd(); CG.active=false; CG.finished=false;
+  CG.timerW=60; CG.timerB=60; CG.selected=null; CG.validMoves=[];
+  CG.lastFrom=null; CG.lastTo=null; CG.turn='w'; CG.moveCount=0; CG.moves=[];
+  CG.betAmt=0;
+
+  updatePlayerBars();
+  renderChessBoard();
+  renderTimers();
+  setStatus('PLACE BET & START WAR','Choose AI opponents → set bet → click ⚔ START WAR');
+
+  // ── Show idle overlay (board is frozen until START WAR) ──
+  const idleOv=document.getElementById('chessIdleOverlay');
+  if(idleOv) idleOv.classList.remove('hidden');
+
+  // ── Hide result overlay & move log placeholder ──
+  const ov=document.getElementById('chessResultOverlay'); if(ov) ov.classList.remove('show');
+  const mg=document.getElementById('chessMoveGrid');
+  if(mg) mg.innerHTML='<span class="chess-move-num" style="color:var(--text3);font-size:0.65rem;grid-column:1/-1;">Waiting for match to start...</span>';
+
+  // ── Show START WAR, hide resign ──
+  const sb=document.getElementById('chessStartBtn'), rb=document.getElementById('chessResignBtn');
+  if(sb) sb.style.display=''; if(rb) rb.style.display='none';
+
+  chessUpdatePayoutPreview();
+};
+
+// Auto-init if page already visible
+if(document.getElementById('page-chess')&&document.getElementById('page-chess').classList.contains('active')) initChessArena();
+
+})();
+</script>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     VORTEX 3D HYPER-REALISM ENGINE v2
+     Neon Ripple · 3D Parallax Tilt · Slide Page Transitions
+     ══════════════════════════════════════════════════════════════ -->
+<style>
+.vx-ripple{position:fixed;pointer-events:none;border-radius:50%;z-index:99999;transform:translate(-50%,-50%) scale(0);animation:vxr .6s cubic-bezier(.25,.46,.45,.94) forwards;}
+@keyframes vxr{0%{transform:translate(-50%,-50%) scale(0);opacity:.85;}60%{transform:translate(-50%,-50%) scale(1);opacity:.35;}100%{transform:translate(-50%,-50%) scale(1.4);opacity:0;}}
+.page.active{animation:pg-slide-in .3s cubic-bezier(.22,.68,0,1.2) both;}
+.page.page-exit{animation:pg-slide-out .22s cubic-bezier(.55,0,1,.45) both;}
+@keyframes pg-slide-in{from{opacity:0;transform:translateX(24px) translateY(6px) scale(.988);}to{opacity:1;transform:none;}}
+@keyframes pg-slide-out{from{opacity:1;transform:none;}to{opacity:0;transform:translateX(-20px);}}
+.game-card{transition:border-color .18s,box-shadow .22s,transform .18s cubic-bezier(.22,.68,0,1.15);}
+#page-home .games-grid,#page-games .games-grid{margin:0;padding:0;}
+</style>
+<script>
+(function(){
+'use strict';
+
+/* 1. NEON RIPPLE ─────────────────── */
+var RC=['rgba(0,212,255,.65)','rgba(0,230,118,.55)','rgba(123,47,255,.6)','rgba(255,45,206,.55)','rgba(255,215,0,.55)'];
+var ri=0;
+document.addEventListener('pointerdown',function(e){
+ if(e.target.closest('.overlay,.modal,.left-sidebar,.header')) return;
+ var c=RC[ri++%RC.length],d=document.createElement('div'),sz=80+Math.random()*55;
+ d.className='vx-ripple';
+ d.style.cssText='left:'+e.clientX+'px;top:'+e.clientY+'px;width:'+sz+'px;height:'+sz+'px;border:2px solid '+c+';box-shadow:0 0 14px '+c+',inset 0 0 8px '+c+';';
+ document.body.appendChild(d);
+ setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d);},700);
+});
+
+/* 2. 3D PARALLAX TILT — mouse + touch + mobile-optimised ── */
+var isTouchDev=('ontouchstart' in window)||(navigator.maxTouchPoints>1);
+var MAX=isTouchDev?8:14, EASE=0.12, ZLIFT=isTouchDev?4:8;
+var raf=null, active=null, state=new WeakMap();
+
+function applyTilt(card,rx,ry){
+ var w=card.offsetWidth, h=card.offsetHeight;
+ var nx=(rx/w-0.5)*2, ny=(ry/h-0.5)*2;
+ var s=state.get(card)||{tx:0,ty:0,tz:0,gx:0,gy:0};
+ s.gx=-ny*MAX; s.gy=nx*MAX; s.tz=ZLIFT;
+ state.set(card,s);
+}
+function loop(){
+ if(!active){raf=null;return;}
+ var s=state.get(active); if(!s){raf=null;return;}
+ s.tx+=(s.gx-s.tx)*EASE; s.ty+=(s.gy-s.ty)*EASE; s.tz+=(ZLIFT-s.tz)*EASE;
+ active.style.transform='perspective(900px) rotateX('+s.tx.toFixed(2)+'deg) rotateY('+s.ty.toFixed(2)+'deg) translateZ('+s.tz.toFixed(1)+'px)';
+ var inn=active.querySelector('.gc-icon-inner');
+ if(inn){var px=(s.ty/MAX)*6,py=(-s.tx/MAX)*6;inn.style.transform='translateZ('+(24+s.tz)+'px) translateX('+px.toFixed(1)+'px) translateY('+py.toFixed(1)+'px) scale(1.04)';}
+ var sh=active._sh;
+ if(sh&&!isTouchDev){var sx=40+s.ty/MAX*22,sy=40-s.tx/MAX*22;sh.style.background='radial-gradient(ellipse at '+sx.toFixed(0)+'% '+sy.toFixed(0)+'%,rgba(255,255,255,.16) 0%,transparent 55%)';}
+ raf=requestAnimationFrame(loop);
+}
+function startTilt(card){
+ active=card;
+ if(!card._sh&&!isTouchDev){var s2=document.createElement('div');s2.style.cssText='position:absolute;inset:0;border-radius:16px;pointer-events:none;z-index:7;';card.appendChild(s2);card._sh=s2;}
+ if(!raf)raf=requestAnimationFrame(loop);
+}
+function resetTilt(card){
+ if(active===card)active=null;
+ var s=state.get(card); if(!s)return;
+ var fr=0;
+ (function spring(){
+  s.tx*=0.78; s.ty*=0.78; s.tz*=0.72;
+  card.style.transform='perspective(900px) rotateX('+s.tx.toFixed(2)+'deg) rotateY('+s.ty.toFixed(2)+'deg) translateZ('+s.tz.toFixed(1)+'px)';
+  var inn=card.querySelector('.gc-icon-inner');
+  if(inn)inn.style.transform='translateZ(20px) scale(1)';
+  if(card._sh)card._sh.style.background='';
+  if((Math.abs(s.tx)>.2||Math.abs(s.ty)>.2)&&fr++<25)requestAnimationFrame(spring);
+  else{card.style.transform='';if(inn)inn.style.transform='';}
+ })();
+}
+function attachTilt(el){
+ if(!el||el._ta)return; el._ta=1;
+ // ── Mouse (desktop) ──
+ el.addEventListener('mousemove',function(e){
+  var c=e.target.closest('.game-card'); if(!c)return;
+  if(active&&active!==c)resetTilt(active);
+  var r=c.getBoundingClientRect();
+  applyTilt(c,e.clientX-r.left,e.clientY-r.top); startTilt(c);
+ });
+ el.addEventListener('mouseleave',function(e){
+  var c=e.target.closest('.game-card');
+  if(c)resetTilt(c); else if(active){resetTilt(active);active=null;}
+ },true);
+ // ── Touch (mobile/tablet) ──
+ el.addEventListener('touchmove',function(e){
+  var c=e.target.closest('.game-card'); if(!c)return;
+  var t=e.touches[0], r=c.getBoundingClientRect();
+  applyTilt(c,t.clientX-r.left,t.clientY-r.top); startTilt(c);
+ },{passive:true});
+ el.addEventListener('touchend',function(e){
+  var c=e.target.closest('.game-card'); if(c)resetTilt(c);
+ },{passive:true});
+ el.addEventListener('touchcancel',function(){
+  if(active)resetTilt(active); active=null;
+ },{passive:true});
+}
+
+new MutationObserver(function(ms){
+ ms.forEach(function(m){m.addedNodes.forEach(function(n){
+  if(n.nodeType!==1)return;
+  if(n.classList&&n.classList.contains('games-grid'))attachTilt(n);
+  n.querySelectorAll&&n.querySelectorAll('.games-grid').forEach(attachTilt);
+ });});
+}).observe(document.body,{childList:true,subtree:true});
+document.querySelectorAll('.games-grid').forEach(attachTilt);
+
+/* 3. PAGE SLIDE TRANSITIONS ────────── */
+var _gp=window.goPage;
+window.goPage=function(pg){
+ var cur=document.querySelector('.page.active');
+ if(cur){cur.classList.add('page-exit');setTimeout(function(){cur.classList.remove('page-exit');},240);}
+ _gp.apply(this,arguments);
+ setTimeout(function(){document.querySelectorAll('.games-grid').forEach(attachTilt);},120);
+};
+
+})();
+</script>
 <!-- ══════════════ CANVAS DIMENSION GUARDIAN — FINAL, CORRECT POSITION ══════════════ -->
 <!-- This script is intentionally placed LAST so all game functions are defined above -->
 <script>
